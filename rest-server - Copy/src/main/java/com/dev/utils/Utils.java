@@ -7,6 +7,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import static com.dev.utils.Definitions.MINIMAL_PASSWORD_LENGTH;
+import static com.dev.utils.Definitions.MINIMAL_USERNAME_LENGTH;
 
 @Component
 public class Utils {
@@ -30,5 +31,10 @@ public class Utils {
 
     public boolean isStrongPassword (String password) {
         return password.length() >= MINIMAL_PASSWORD_LENGTH;
+    }
+
+    public boolean isValidUsername(String username){
+        return username.length() >= MINIMAL_USERNAME_LENGTH
+                && username.matches("[a-zA-Z]+");
     }
 }

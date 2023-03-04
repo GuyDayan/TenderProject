@@ -1,6 +1,7 @@
 package com.dev.utils;
 
 public class Errors {
+    public static final int ERROR_WEAK_USERNAME = 999;
     public static final int ERROR_MISSING_USERNAME = 1000;
     public static final int ERROR_MISSING_PASSWORD = 1001;
     public static final int ERROR_WEAK_PASSWORD = 1002;

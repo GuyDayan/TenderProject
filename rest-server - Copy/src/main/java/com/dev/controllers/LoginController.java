@@ -7,6 +7,7 @@ import com.dev.utils.Persist;
 import com.dev.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.dev.utils.Errors.*;
@@ -27,21 +28,26 @@ public class LoginController {
         boolean success = false;
         Integer errorCode = null;
         if (username != null) {
-            if (password != null) {
-                if (utils.isStrongPassword(password)) {
-                    User fromDb = persist.getUserByUsername(username);
-                    if (fromDb == null) {
-                        User toAdd = new User(username, utils.createHash(username, password));
-                        persist.saveUser(toAdd);
-                        success = true;
+            username= username.trim();
+            if (utils.isValidUsername(username)){
+                if (password != null) {
+                    if (utils.isStrongPassword(password)) {
+                        User fromDb = persist.getUserByUsername(username);
+                        if (fromDb == null) {
+                            User toAdd = new User(username, utils.createHash(username, password));
+                            persist.saveUser(toAdd);
+                            success = true;
+                        } else {
+                            errorCode = ERROR_USERNAME_ALREADY_EXISTS;
+                        }
                     } else {
-                        errorCode = ERROR_USERNAME_ALREADY_EXISTS;
+                        errorCode = ERROR_WEAK_PASSWORD;
                     }
                 } else {
-                    errorCode = ERROR_WEAK_PASSWORD;
+                    errorCode = ERROR_MISSING_PASSWORD;
                 }
-            } else {
-                errorCode = ERROR_MISSING_PASSWORD;
+            }else {
+                errorCode = ERROR_WEAK_USERNAME;
             }
         } else {
             errorCode = ERROR_MISSING_USERNAME;
@@ -51,24 +57,30 @@ public class LoginController {
         return basicResponse;
     }
 
-    @RequestMapping (value = "login")
+    @RequestMapping (value = "login" , method = RequestMethod.POST)
     public BasicResponse login (String username, String password) {
         BasicResponse basicResponse = new BasicResponse();
         boolean success = false;
         Integer errorCode = null;
         if (username != null) {
-            if (password != null) {
-                String token = utils.createHash(username, password);
-                User fromDb = persist.getUserByUsernameAndToken(username, token);
-                if (fromDb != null) {
-                    success = true;
-                    basicResponse = new LoginResponse(token);
+            username= username.trim();
+            if (utils.isValidUsername(username)){
+                if (password != null) {
+                    String token = utils.createHash(username, password);
+                    User fromDb = persist.getUserByUsernameAndToken(username, token);
+                    if (fromDb != null) {
+                        success = true;
+                        basicResponse = new LoginResponse(token);
+                    } else {
+                        errorCode = ERROR_WRONG_LOGIN_CREDS;
+                    }
                 } else {
-                    errorCode = ERROR_WRONG_LOGIN_CREDS;
+                    errorCode = ERROR_MISSING_PASSWORD;
                 }
-            } else {
-                errorCode = ERROR_MISSING_PASSWORD;
+            }else {
+                errorCode = ERROR_MISSING_USERNAME;
             }
+
         } else {
             errorCode = ERROR_MISSING_USERNAME;
         }
