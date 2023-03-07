@@ -11,38 +11,38 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     private int id;
-
     @Column(name = "name")
     private String name;
-
     @Column(name = "logo_url")
     private String logoUrl;
-
     @Column
     private String description;
 
     @Column(name = "creation_date")
     private Date creationDate;
-
     @Column(name = "starting_price")
     private Integer startingPrice;
-
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User ownerUser;
+    @JoinColumn(name = "seller_user_id")
+    private User sellerUser;
+
+    @Column(name = "is_open")
+    private boolean isOpen;
+
 
 
     public Product(){
 
     }
 
-    public Product(String name, String logoUrl, String description, Integer startingPrice, User ownerUser) {
+    public Product(String name, String logoUrl, String description, Integer startingPrice, User sellerUser) {
         this.name = name;
         this.logoUrl = logoUrl;
         this.description = description;
         this.startingPrice = startingPrice;
-        this.ownerUser = ownerUser;
+        this.sellerUser = sellerUser;
         this.creationDate = new Date();
+        this.isOpen = true;
     }
 
     public int getId() {
@@ -93,11 +93,18 @@ public class Product {
         this.startingPrice = startingPrice;
     }
 
-    public User getOwnerUser() {
-        return ownerUser;
+    public User getSellerUser() {
+        return sellerUser;
+    }
+    public boolean isOpen() {
+        return isOpen;
     }
 
-    public void setOwnerUser(User ownerUser) {
-        this.ownerUser = ownerUser;
+    public void setOpen(boolean open) {
+        isOpen = open;
+    }
+
+    public void setSellerUser(User sellerUser) {
+        this.sellerUser = sellerUser;
     }
 }

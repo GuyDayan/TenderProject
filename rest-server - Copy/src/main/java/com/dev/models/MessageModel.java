@@ -10,7 +10,6 @@ public class MessageModel {
     private String content;
     private String sendDate;
     private String senderUsername;
-
     private boolean sentByMe;
 
     public MessageModel () {

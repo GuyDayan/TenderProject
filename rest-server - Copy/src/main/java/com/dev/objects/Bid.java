@@ -14,12 +14,16 @@ public class Bid {
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "user_seller_id")
+    private User sellerUser;
 
     @ManyToOne
-    @JoinColumn(name = "tender_id")
-    private Tender tender;
+    @JoinColumn(name = "user_buyer_id")
+    private User buyerUser;
+
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
 
     @Column
     private Integer offer;
@@ -39,20 +43,28 @@ public class Bid {
         this.id = id;
     }
 
-    public User getUser() {
-        return user;
+    public User getSellerUser() {
+        return sellerUser;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setSellerUser(User sellerUser) {
+        this.sellerUser = sellerUser;
     }
 
-    public Tender getTender() {
-        return tender;
+    public User getBuyerUser() {
+        return buyerUser;
     }
 
-    public void setTender(Tender tender) {
-        this.tender = tender;
+    public void setBuyerUser(User buyerUser) {
+        this.buyerUser = buyerUser;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
     }
 
     public Integer getOffer() {

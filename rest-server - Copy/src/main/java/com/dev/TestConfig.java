@@ -48,7 +48,6 @@ public class TestConfig {
         }
 
         configuration.addAnnotatedClass(User.class);
-        configuration.addAnnotatedClass(Tender.class);
         configuration.addAnnotatedClass(Product.class);
         configuration.addAnnotatedClass(Bid.class);
         configuration.addAnnotatedClass(AdminUser.class);

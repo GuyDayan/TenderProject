@@ -67,10 +67,10 @@ public class LoginController {
             if (utils.isValidUsername(username)){
                 if (password != null) {
                     String token = utils.createHash(username, password);
-                    User fromDb = persist.getUserByUsernameAndToken(username, token);
-                    if (fromDb != null) {
+                    User user = persist.getUserByUsernameAndToken(username, token);
+                    if (user != null) {
                         success = true;
-                        basicResponse = new LoginResponse(token);
+                        basicResponse = new LoginResponse(true,null,token,user.getId());
                     } else {
                         errorCode = ERROR_WRONG_LOGIN_CREDS;
                     }
