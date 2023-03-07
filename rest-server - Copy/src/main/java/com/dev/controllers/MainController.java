@@ -19,7 +19,6 @@ public class MainController {
 
 
     public BasicResponse basicValidation(String token , Integer userId){
-
         BasicResponse response;
         if (userId!=null){
             if (token!=null){

@@ -34,8 +34,35 @@ public class FeaturesController extends MainController{
         return response;
     }
 
+    @RequestMapping(value = "close-tender" ,method = RequestMethod.POST)
+    public BasicResponse closeTender(String token , Integer userId , Integer productId){
+        BasicResponse response = basicValidation(token,userId);
+        if (response.isSuccess()){
+            if (productId != null){
+                Product product = persist.productIsExist(productId);
+                if (product!= null){
+                    if (product.getSellerUser().getId() == userId){
+                        Product updatedProduct = persist.closeTender(productId);
+                        if (!updatedProduct.isOpen()){
+                            response = new BasicResponse(true , null);
+                        }else {
+                            response = new BasicResponse(false, Errors.GENERAL_ERROR);
+                        }
 
+                    }else {
+                        response = new BasicResponse(false,Errors.ERROR_USER_DOESNT_OWNER);
+                    }
 
+                }else {
+                    response = new BasicResponse(false,Errors.ERROR_PRODUCT_DOESNT_EXIST);
+
+                }
+            }else {
+                response = new BasicResponse(false,Errors.ERROR_MISSING_PRODUCT_ID);
+            }
+        }
+        return response;
+    }
 
     @RequestMapping(value = "add-new-product" , method = RequestMethod.POST)
     public BasicResponse addNewProduct(String token, Integer userId , String name ,String description , String logoUrl , Integer startingPrice){

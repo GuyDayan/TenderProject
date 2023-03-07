@@ -1,13 +1,20 @@
 package com.dev.utils;
 
 public class Errors {
+    public static final int  GENERAL_ERROR = 10;
     public static final int PERMISSION_ERROR_CODE = 413;
     public static final int PRODUCT_NAME_REQUIRED = 80;
     public static final int PRODUCT_DESCRIPTION_REQUIRED = 81;
     public static final int PRODUCT_LOGO_URL_REQUIRED = 82;
     public static final int PRODUCT_STARTING_PRICE_REQUIRED = 83;
-
     public static final int PRODUCT_STARTING_PRICE_MUST_BE_INTEGER = 84;
+
+    public static final int ERROR_MISSING_PRODUCT_ID = 85;
+    public static final int ERROR_PRODUCT_DOESNT_EXIST = 86;
+    public static final int ERROR_USER_DOESNT_OWNER = 87;
+
+
+
 
 
     public static final int ERROR_WEAK_USERNAME = 999;

@@ -1,11 +1,8 @@
 package com.dev.responses;
 
 import com.dev.models.ProductModel;
-import com.dev.objects.Product;
-import com.dev.objects.ProductData;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ProductsResponse extends BasicResponse{
 

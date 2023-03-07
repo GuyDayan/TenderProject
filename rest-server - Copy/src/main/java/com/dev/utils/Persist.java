@@ -4,6 +4,7 @@ package com.dev.utils;
 import com.dev.objects.*;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -138,5 +139,21 @@ public class Persist {
                         .setParameter("userId", userId).list();
         session.close();
         return bids;
+    }
+
+    public Product productIsExist(Integer productId) {
+        Session session = sessionFactory.openSession();
+        return (Product) session.createQuery("FROM Product where id =:productId").setParameter("productId"  , productId).uniqueResult();
+    }
+
+    public Product closeTender(Integer productId) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        Product product = session.get(Product.class,productId);
+        product.setOpen(false);
+        session.update(product);
+        transaction.commit();
+        session.close();
+        return product;
     }
 }
