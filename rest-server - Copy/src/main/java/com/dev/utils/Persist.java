@@ -150,10 +150,29 @@ public class Persist {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
         Product product = session.get(Product.class,productId);
-        product.setOpen(false);
+        product.setOpenForSale(false);
         session.update(product);
         transaction.commit();
         session.close();
         return product;
+    }
+
+    public List<Product> getProductsForSale(Integer userId) {
+        Session session = sessionFactory.openSession();
+        List<Product> products =
+                session.createQuery("FROM Product WHERE sellerUser.id !=:userId")
+                        .setParameter("userId", userId).list();
+        session.close();
+        return products;
+
+    }
+
+    public boolean productHasMinBids(Integer productId) {
+        Session session = sessionFactory.openSession();
+        List<Bid> bids =
+                session.createQuery("FROM Bid WHERE product.id =:productId")
+                        .setParameter("productId", productId).list();
+        session.close();
+        return bids.size() >= Definitions.MIN_BIDS_FOR_CLOSE_TENDER;
     }
 }

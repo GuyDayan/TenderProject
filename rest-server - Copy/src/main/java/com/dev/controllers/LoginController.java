@@ -22,26 +22,43 @@ public class LoginController {
     @Autowired
     private Persist persist;
 
+
     @RequestMapping(value = "sign-up")
-    public BasicResponse signUp (String username, String password) {
+    public BasicResponse signUp (String fullName , String email ,String username, String password , String repeatPassword) {
         BasicResponse basicResponse = new BasicResponse();
         boolean success = false;
         Integer errorCode = null;
+        fullName = fullName.trim();
+        username= username.trim();
+        password = password.trim();
+        email = email.trim();
+        repeatPassword = repeatPassword.trim();
         if (username != null) {
-            username= username.trim();
             if (utils.isValidUsername(username)){
-                if (password != null) {
-                    if (utils.isStrongPassword(password)) {
-                        User fromDb = persist.getUserByUsername(username);
-                        if (fromDb == null) {
-                            User toAdd = new User(username, utils.createHash(username, password));
-                            persist.saveUser(toAdd);
-                            success = true;
+                if (password != null && repeatPassword!=null){
+                    if (password.equals(repeatPassword)){
+                        if (utils.isStrongPassword(password) && utils.isStrongPassword(repeatPassword)) {
+                            if (fullName!=null){
+                                if (email!=null){
+                                    User fromDb = persist.getUserByUsername(username);
+                                    if (fromDb == null) {
+                                        User toAdd = new User(username, utils.createHash(username, password));
+                                        persist.saveUser(toAdd);
+                                        success = true;
+                                    } else {
+                                        errorCode = ERROR_USERNAME_ALREADY_EXISTS;
+                                    }
+                                }else {
+                                    errorCode = ERROR_MISSING_EMAIL;
+                                }
+                            }else {
+                                errorCode = ERROR_MISSING_FULLNAME;
+                            }
                         } else {
-                            errorCode = ERROR_USERNAME_ALREADY_EXISTS;
+                            errorCode = ERROR_WEAK_PASSWORD;
                         }
-                    } else {
-                        errorCode = ERROR_WEAK_PASSWORD;
+                    }else {
+                        errorCode = ERROR_PASSWORD_DONT_MATCH;
                     }
                 } else {
                     errorCode = ERROR_MISSING_PASSWORD;

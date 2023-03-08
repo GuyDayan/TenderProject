@@ -26,8 +26,8 @@ public class Product {
     @JoinColumn(name = "seller_user_id")
     private User sellerUser;
 
-    @Column(name = "is_open")
-    private boolean isOpen;
+    @Column(name = "is_open_for_sale")
+    private boolean openForSale;
 
 
 
@@ -42,7 +42,7 @@ public class Product {
         this.startingPrice = startingPrice;
         this.sellerUser = sellerUser;
         this.creationDate = new Date();
-        this.isOpen = true;
+        this.openForSale = true;
     }
 
     public int getId() {
@@ -96,12 +96,13 @@ public class Product {
     public User getSellerUser() {
         return sellerUser;
     }
-    public boolean isOpen() {
-        return isOpen;
+
+    public boolean isOpenForSale() {
+        return openForSale;
     }
 
-    public void setOpen(boolean open) {
-        isOpen = open;
+    public void setOpenForSale(boolean openForSale) {
+        this.openForSale = openForSale;
     }
 
     public void setSellerUser(User sellerUser) {

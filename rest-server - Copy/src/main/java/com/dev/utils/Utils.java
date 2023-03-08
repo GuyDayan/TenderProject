@@ -1,6 +1,6 @@
 package com.dev.utils;
 
-import com.dev.models.ProductModel;
+import com.dev.models.MyProductsModel;
 import com.dev.objects.Bid;
 import com.dev.objects.Product;
 import org.springframework.stereotype.Component;
@@ -38,13 +38,14 @@ public class Utils {
         return password.length() >= MINIMAL_PASSWORD_LENGTH;
     }
 
+
     public boolean isValidUsername(String username){
         return username.length() >= MINIMAL_USERNAME_LENGTH
                 && username.matches("[a-zA-Z]+");
     }
 
-    public List<ProductModel> calculateBiggestBids(List<Product> products , List<Bid> bids) {
-        List<ProductModel> productModelList = new ArrayList<>();
+    public List<MyProductsModel> calculateBiggestBids(List<Product> products , List<Bid> bids) {
+        List<MyProductsModel> productModelList = new ArrayList<>();
         for (Product product : products){
             int currentBiggestBid = product.getStartingPrice();
             for (Bid bid : bids){
@@ -54,7 +55,7 @@ public class Utils {
                     }
                 }
             }
-            ProductModel productModel = new ProductModel(product,currentBiggestBid);
+            MyProductsModel productModel = new MyProductsModel(product,currentBiggestBid);
             productModelList.add(productModel);
         }
         return productModelList;

@@ -10,6 +10,8 @@ public class Definitions {
 
     public static final String EVENT_TYPING = "1";
 
+    public static final int MIN_BIDS_FOR_CLOSE_TENDER = 3;
+
     public static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
 

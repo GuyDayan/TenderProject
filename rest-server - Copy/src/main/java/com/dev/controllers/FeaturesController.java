@@ -1,9 +1,11 @@
 package com.dev.controllers;
 
-import com.dev.models.ProductModel;
+import com.dev.models.MyProductsModel;
+import com.dev.models.ProductForSaleModel;
 import com.dev.objects.*;
 import com.dev.responses.BasicResponse;
-import com.dev.responses.ProductsResponse;
+import com.dev.responses.MyProductsResponse;
+import com.dev.responses.ProductForSaleResponse;
 import com.dev.utils.Errors;
 import com.dev.utils.Persist;
 import com.dev.utils.Utils;
@@ -13,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 public class FeaturesController extends MainController{
@@ -23,16 +24,37 @@ public class FeaturesController extends MainController{
     private Utils utils;
 
     @RequestMapping(value = "get-my-products" , method = RequestMethod.GET)
-    public BasicResponse getProducts(String token,Integer userId){
-        BasicResponse response = basicValidation(token,userId);;
+    public BasicResponse getMyProducts(String token,Integer userId){
+        BasicResponse response = basicValidation(token,userId);
         if (response.isSuccess()){
             List<Product> products = persist.getProductsBySellerUserId(userId);
             List<Bid> bids = persist.getBidsBySellerUserId(userId);
-            List<ProductModel> productsList = utils.calculateBiggestBids(products,bids);
-            response = new ProductsResponse(true,null, productsList);
+            List<MyProductsModel> productsList = utils.calculateBiggestBids(products,bids);
+            response = new MyProductsResponse(true,null, productsList);
         }
         return response;
     }
+
+    @RequestMapping(value = "get-product" , method = RequestMethod.GET)
+    public BasicResponse getProduct(String token , Integer userId){
+        BasicResponse response = basicValidation(token,userId);
+        if (response.isSuccess()){
+
+        }
+        return response;
+    }
+
+    @RequestMapping(value = "get-products-for-sale" , method = RequestMethod.GET)
+    public BasicResponse getProductsForSale(String token , Integer userId){
+        BasicResponse response = basicValidation(token,userId);
+        if (response.isSuccess()){
+            List<Product> productsForSale = persist.getProductsForSale(userId);
+            response = new ProductForSaleResponse(true,null, productsForSale);
+        }
+        return response;
+
+    }
+
 
     @RequestMapping(value = "close-tender" ,method = RequestMethod.POST)
     public BasicResponse closeTender(String token , Integer userId , Integer productId){
@@ -42,13 +64,16 @@ public class FeaturesController extends MainController{
                 Product product = persist.productIsExist(productId);
                 if (product!= null){
                     if (product.getSellerUser().getId() == userId){
-                        Product updatedProduct = persist.closeTender(productId);
-                        if (!updatedProduct.isOpen()){
-                            response = new BasicResponse(true , null);
+                        if (persist.productHasMinBids(productId)){
+                            Product updatedProduct = persist.closeTender(productId);
+                            if (!updatedProduct.isOpenForSale()){
+                                response = new BasicResponse(true , null);
+                            }else {
+                                response = new BasicResponse(false, Errors.GENERAL_ERROR);
+                            }
                         }else {
-                            response = new BasicResponse(false, Errors.GENERAL_ERROR);
+                            response = new BasicResponse(false, Errors.PRODUCT_HASNT_ENOUGH_BIDS);
                         }
-
                     }else {
                         response = new BasicResponse(false,Errors.ERROR_USER_DOESNT_OWNER);
                     }
@@ -67,6 +92,9 @@ public class FeaturesController extends MainController{
     @RequestMapping(value = "add-new-product" , method = RequestMethod.POST)
     public BasicResponse addNewProduct(String token, Integer userId , String name ,String description , String logoUrl , Integer startingPrice){
         BasicResponse response;
+        name = name.trim();
+        description = description.trim();
+        logoUrl = logoUrl.trim();
         if (userId != null){
             if (token != null){
                 if (userHasPermissions(userId,token)){

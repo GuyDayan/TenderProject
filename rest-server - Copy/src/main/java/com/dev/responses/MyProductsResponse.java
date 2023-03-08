@@ -1,15 +1,15 @@
 package com.dev.responses;
 
-import com.dev.models.ProductModel;
+import com.dev.models.MyProductsModel;
 
 import java.util.List;
 
-public class ProductsResponse extends BasicResponse{
+public class MyProductsResponse extends BasicResponse{
 
-    private List<ProductModel> productsList;
+    private List<MyProductsModel> productsList;
 
 
-    public ProductsResponse(boolean success, Integer errorCode, List<ProductModel> productsList) {
+    public MyProductsResponse(boolean success, Integer errorCode, List<MyProductsModel> productsList) {
         super(success, errorCode);
         this.productsList = productsList;
     }
@@ -26,11 +26,11 @@ public class ProductsResponse extends BasicResponse{
 //    }
 
 
-    public List<ProductModel> getProductsList() {
+    public List<MyProductsModel> getProductsList() {
         return productsList;
     }
 
-    public void setProductsList(List<ProductModel> productsList) {
+    public void setProductsList(List<MyProductsModel> productsList) {
         this.productsList = productsList;
     }
 }

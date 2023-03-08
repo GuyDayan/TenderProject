@@ -19,18 +19,18 @@ public class User {
     @Column
     private String email;
 
-    @Column
-    private String first_name;
-
-    @Column
-    private String last_name;
+    @Column(name = "full_name")
+    private String fullName;
 
     @Column
     private String creation_date;
 
 
+    @Column(name = "last_login")
+    private String lastLogin;
+
     @Column
-    private String last_login;
+    private double credit;
 
 
     public User() {

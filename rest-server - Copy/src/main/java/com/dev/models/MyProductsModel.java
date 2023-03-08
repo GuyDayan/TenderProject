@@ -1,10 +1,9 @@
 package com.dev.models;
 
 import com.dev.objects.Product;
-import static com.dev.utils.Definitions.*;
 
 
-public class ProductModel {
+public class MyProductsModel {
 
     private int id;
     private String name;
@@ -16,7 +15,7 @@ public class ProductModel {
 //    private String username;
 //    private int userId;
 
-    private boolean isOpen;
+    private boolean isOpenForSale;
     private int biggestBid;
 
 
@@ -30,11 +29,11 @@ public class ProductModel {
 //        this.userId = product.getSellerUser().getId();
 //    }
 
-    public ProductModel(Product product , int biggestBid){
+    public MyProductsModel(Product product , int biggestBid){
         this.id = product.getId();
         this.name = product.getName();
         this.biggestBid = biggestBid;
-        this.isOpen = product.isOpen();
+        this.isOpenForSale = product.isOpenForSale();
     }
 
     public int getId() {
@@ -53,12 +52,12 @@ public class ProductModel {
         this.name = name;
     }
 
-    public boolean isOpen() {
-        return isOpen;
+    public boolean isOpenForSale() {
+        return isOpenForSale;
     }
 
-    public void setOpen(boolean open) {
-        isOpen = open;
+    public void setOpenForSale(boolean openForSale) {
+        isOpenForSale = openForSale;
     }
 
     public int getBiggestBid() {

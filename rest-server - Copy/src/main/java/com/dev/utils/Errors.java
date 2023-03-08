@@ -13,6 +13,7 @@ public class Errors {
     public static final int ERROR_PRODUCT_DOESNT_EXIST = 86;
     public static final int ERROR_USER_DOESNT_OWNER = 87;
 
+    public static final int PRODUCT_HASNT_ENOUGH_BIDS = 88;
 
 
 
@@ -27,5 +28,11 @@ public class Errors {
     public static final int NO_SUCH_RECIPIENT = 1006;
 
     public static final int ERROR_MISSING_TOKEN = 1007;
+
+    public static final int ERROR_PASSWORD_DONT_MATCH = 1008;
+
+    public static final int ERROR_MISSING_FULLNAME = 1009;
+    public static final int ERROR_MISSING_EMAIL = 1010;
+
 
 }
