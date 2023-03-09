@@ -8,9 +8,6 @@ import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
-import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -146,7 +143,7 @@ public class Persist {
         return (Product) session.createQuery("FROM Product where id =:productId").setParameter("productId"  , productId).uniqueResult();
     }
 
-    public Product closeTender(Integer productId) {
+    public Product closeAuction(Integer productId) {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
         Product product = session.get(Product.class,productId);
@@ -167,12 +164,13 @@ public class Persist {
 
     }
 
-    public boolean productHasMinBids(Integer productId) {
+
+    public List<Bid> getBidsByProductIdAsc(Integer productId) {
         Session session = sessionFactory.openSession();
         List<Bid> bids =
-                session.createQuery("FROM Bid WHERE product.id =:productId")
+                session.createQuery("FROM Bid WHERE product.id =:productId ORDER BY bidDate ASC")
                         .setParameter("productId", productId).list();
         session.close();
-        return bids.size() >= Definitions.MIN_BIDS_FOR_CLOSE_TENDER;
+        return bids;
     }
 }

@@ -3,6 +3,7 @@ package com.dev.utils;
 import com.dev.models.MyProductsModel;
 import com.dev.objects.Bid;
 import com.dev.objects.Product;
+import com.dev.objects.User;
 import org.springframework.stereotype.Component;
 
 import javax.xml.bind.DatatypeConverter;
@@ -59,5 +60,17 @@ public class Utils {
             productModelList.add(productModel);
         }
         return productModelList;
+    }
+
+    public User checkForAuctionWinner(List<Bid> bidsOnProductAsc, Product currentProduct) {
+        User winnerUser = null;
+        Integer maxPrice = currentProduct.getStartingPrice();
+        for (Bid bid : bidsOnProductAsc){
+            if (bid.getOffer() > maxPrice){
+                maxPrice = bid.getOffer();
+                winnerUser = bid.getBuyerUser();
+            }
+        }
+        return winnerUser;
     }
 }

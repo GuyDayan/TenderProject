@@ -1,11 +1,11 @@
 package com.dev.controllers;
 
 import com.dev.models.MyProductsModel;
-import com.dev.models.ProductForSaleModel;
 import com.dev.objects.*;
 import com.dev.responses.BasicResponse;
 import com.dev.responses.MyProductsResponse;
 import com.dev.responses.ProductForSaleResponse;
+import com.dev.utils.Definitions;
 import com.dev.utils.Errors;
 import com.dev.utils.Persist;
 import com.dev.utils.Utils;
@@ -56,18 +56,21 @@ public class FeaturesController extends MainController{
     }
 
 
-    @RequestMapping(value = "close-tender" ,method = RequestMethod.POST)
-    public BasicResponse closeTender(String token , Integer userId , Integer productId){
+    @RequestMapping(value = "close-auction" ,method = RequestMethod.POST)
+    public BasicResponse closeAuction(String token , Integer userId , Integer productId){
         BasicResponse response = basicValidation(token,userId);
         if (response.isSuccess()){
             if (productId != null){
                 Product product = persist.productIsExist(productId);
                 if (product!= null){
                     if (product.getSellerUser().getId() == userId){
-                        if (persist.productHasMinBids(productId)){
-                            Product updatedProduct = persist.closeTender(productId);
+                        List<Bid> bidsOnProductAsc = persist.getBidsByProductIdAsc(productId);
+                        if (bidsOnProductAsc.size() >= Definitions.MIN_BIDS_FOR_CLOSE_AUCTION){
+                            Product updatedProduct = persist.closeAuction(productId);
                             if (!updatedProduct.isOpenForSale()){
-                                response = new BasicResponse(true , null);
+                                User winnerUser  = utils.checkForAuctionWinner(bidsOnProductAsc,product);
+                                /// winner user can be null  = no winner
+                                /// add response to close auction
                             }else {
                                 response = new BasicResponse(false, Errors.GENERAL_ERROR);
                             }
