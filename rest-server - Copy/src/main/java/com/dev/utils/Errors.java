@@ -15,6 +15,15 @@ public class Errors {
 
     public static final int PRODUCT_HASNT_ENOUGH_BIDS = 88;
 
+    public static final int ERROR_BID_ON_YOUR_PRODUCT = 89;
+
+    public static final int ERROR_PRODUCT_NOT_ON_SALE = 90;
+
+    public static final int ERROR_OFFER_LOW = 90;
+
+
+
+
 
 
 

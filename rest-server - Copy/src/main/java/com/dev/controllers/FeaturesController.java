@@ -3,6 +3,7 @@ package com.dev.controllers;
 import com.dev.models.MyProductsModel;
 import com.dev.objects.*;
 import com.dev.responses.BasicResponse;
+import com.dev.responses.CloseAuctionResponse;
 import com.dev.responses.MyProductsResponse;
 import com.dev.responses.ProductForSaleResponse;
 import com.dev.utils.Definitions;
@@ -34,6 +35,52 @@ public class FeaturesController extends MainController{
         }
         return response;
     }
+    @RequestMapping(value = "place-bid" , method = RequestMethod.POST)
+    public BasicResponse placeBid(String token,Integer userId,Integer productId ,int offer){
+        BasicResponse response = basicValidation(token,userId);
+        if (response.isSuccess()){
+            if (productId!=null){
+                Product product = persist.productIsExist(productId);
+                if (product!=null){
+                    if (product.getSellerUser().getId() != userId){
+                        if (product.isOpenForSale()){
+                            Integer maxOffer = persist.getBiggestBidOnProduct(productId);
+                            User buyerUser = persist.getUserById(userId);
+                            Bid bid = new Bid(buyerUser,product,offer);
+                            if (maxOffer!=null){
+                                if (offer > maxOffer){
+                                    persist.saveBid(bid);
+                                    response = new BasicResponse(true,null);
+
+                                }else {
+                                    response = new BasicResponse(false,Errors.ERROR_OFFER_LOW);
+                                }
+                            }else {
+                                if (offer > product.getStartingPrice()){
+                                   persist.saveBid(bid);
+                                   response = new BasicResponse(true,null);
+                                }else {
+                                    response = new BasicResponse(false,Errors.ERROR_OFFER_LOW);
+                                }
+                            }
+                        }else {
+                            response = new BasicResponse(false,Errors.ERROR_PRODUCT_NOT_ON_SALE);
+
+                        }
+                    }else {
+                        response = new BasicResponse(false,Errors.ERROR_BID_ON_YOUR_PRODUCT);
+                    }
+                }else {
+                    response = new BasicResponse(false,Errors.ERROR_PRODUCT_DOESNT_EXIST);
+
+                }
+            }else {
+                response = new BasicResponse(false,Errors.ERROR_MISSING_PRODUCT_ID);
+            }
+        }
+        return response;
+    }
+
 
     @RequestMapping(value = "get-product" , method = RequestMethod.GET)
     public BasicResponse getProduct(String token , Integer userId){
@@ -69,8 +116,11 @@ public class FeaturesController extends MainController{
                             Product updatedProduct = persist.closeAuction(productId);
                             if (!updatedProduct.isOpenForSale()){
                                 User winnerUser  = utils.checkForAuctionWinner(bidsOnProductAsc,product);
-                                /// winner user can be null  = no winner
-                                /// add response to close auction
+                                if (winnerUser != null){
+                                    response = new CloseAuctionResponse(true,null,winnerUser);
+                                }else {
+                                    response = new CloseAuctionResponse(true,null, null);
+                                }
                             }else {
                                 response = new BasicResponse(false, Errors.GENERAL_ERROR);
                             }

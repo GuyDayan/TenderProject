@@ -13,15 +13,23 @@ import java.util.List;
 
 public class ProductForSaleResponse extends BasicResponse{
 
-    private List<ProductForSaleModel> products;
+    private List<ProductForSaleModel> products = new ArrayList<>();
 
 
     public ProductForSaleResponse(boolean success, Integer errorCode, List<Product> products) {
         super(success, errorCode);
-        for (Product product : products){
-            this.products.add(new ProductForSaleModel(product));
-        }
+            for (Product product : products){
+                this.products.add(new ProductForSaleModel(product));
+            }
+
+
     }
 
+    public void setProducts(List<ProductForSaleModel> products) {
+        this.products = products;
+    }
 
+    public List<ProductForSaleModel> getProducts() {
+        return products;
+    }
 }

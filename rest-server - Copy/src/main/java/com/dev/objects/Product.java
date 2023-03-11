@@ -26,9 +26,12 @@ public class Product {
     @JoinColumn(name = "seller_user_id")
     private User sellerUser;
 
+    @ManyToOne
+    @JoinColumn(name = "winner_user_id")
+    private User winnerUserId;
+
     @Column(name = "is_open_for_sale")
     private boolean openForSale;
-
 
 
     public Product(){

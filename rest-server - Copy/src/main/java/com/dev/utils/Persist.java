@@ -157,7 +157,7 @@ public class Persist {
     public List<Product> getProductsForSale(Integer userId) {
         Session session = sessionFactory.openSession();
         List<Product> products =
-                session.createQuery("FROM Product WHERE sellerUser.id !=:userId")
+                session.createQuery("FROM Product WHERE sellerUser.id != :userId")
                         .setParameter("userId", userId).list();
         session.close();
         return products;
@@ -172,5 +172,24 @@ public class Persist {
                         .setParameter("productId", productId).list();
         session.close();
         return bids;
+    }
+
+    public Integer getBiggestBidOnProduct(Integer productId) {
+        Integer maxOffer = null;
+        Session session = sessionFactory.openSession();
+        List<Bid> bids =
+                session.createQuery("FROM Bid WHERE product.id =:productId ORDER BY offer DESC")
+                        .setParameter("productId", productId).list();
+        session.close();
+        if (!(bids.size() == 0)){
+            maxOffer = bids.get(0).getOffer();
+        }
+        return maxOffer;
+    }
+
+    public Bid saveBid(Bid bid) {
+        Session session = sessionFactory.openSession();
+        session.save(bid);
+        session.close();
     }
 }
