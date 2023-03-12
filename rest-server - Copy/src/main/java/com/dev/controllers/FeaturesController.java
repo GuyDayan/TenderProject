@@ -1,11 +1,9 @@
 package com.dev.controllers;
 
 import com.dev.models.MyProductsModel;
+import com.dev.models.ProductDetailsModel;
 import com.dev.objects.*;
-import com.dev.responses.BasicResponse;
-import com.dev.responses.CloseAuctionResponse;
-import com.dev.responses.MyProductsResponse;
-import com.dev.responses.ProductForSaleResponse;
+import com.dev.responses.*;
 import com.dev.utils.Definitions;
 import com.dev.utils.Errors;
 import com.dev.utils.Persist;
@@ -15,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class FeaturesController extends MainController {
@@ -73,11 +73,16 @@ public class FeaturesController extends MainController {
     }
 
 
-    @RequestMapping(value = "get-product", method = RequestMethod.GET)
-    public BasicResponse getProduct(String token, Integer userId) {
+    @RequestMapping(value = "get-product-details", method = RequestMethod.GET)
+    public BasicResponse getProductDetails(String token, Integer userId,Integer productId) {
         BasicResponse response = basicValidation(token, userId);
         if (response.isSuccess()) {
-
+            Product product = persist.productIsExist(productId);
+            if (product!=null){
+                List<Bid> allProductBids = persist.getBidsByProductIdBidDateAsc(productId);
+                List<Bid> myBids = allProductBids.stream().filter(bid-> bid.getBuyerUser().getId() == userId).collect(Collectors.toList());
+                response = new ProductDetailsResponse(true,null,product,myBids,allProductBids.size());
+            }
         }
         return response;
     }
@@ -87,7 +92,7 @@ public class FeaturesController extends MainController {
         BasicResponse response = basicValidation(token, userId);
         if (response.isSuccess()) {
             List<Product> productsForSale = persist.getProductsForSale(userId);
-            response = new ProductForSaleResponse(true, null, productsForSale);
+            response = new ProductsForSaleResponse(true,null,productsForSale);
         }
         return response;
 
@@ -102,16 +107,13 @@ public class FeaturesController extends MainController {
                 Product product = persist.productIsExist(productId);
                 if (product != null) {
                     if (product.getSellerUser().getId() == userId) {
-                        List<Bid> bidsOnProductAsc = persist.getBidsByProductIdAsc(productId);
+                        List<Bid> bidsOnProductAsc = persist.getBidsByProductIdBidDateAsc(productId);
                         if (bidsOnProductAsc.size() >= Definitions.MIN_BIDS_FOR_CLOSE_AUCTION) {
-                            Product updatedProduct = persist.closeAuction(productId);
-                            if (!updatedProduct.isOpenForSale()) {
+                            Product closedProduct = persist.closeAuction(productId);
+                            if (!closedProduct.isOpenForSale()) {
                                 User winnerUser = utils.checkForAuctionWinner(bidsOnProductAsc, product);
-                                if (winnerUser != null) {
-                                    response = new CloseAuctionResponse(true, null, winnerUser);
-                                } else {
-                                    response = new CloseAuctionResponse(true, null, null);
-                                }
+                                persist.saveWinnerUser(closedProduct.getId(),winnerUser);
+                                response = new CloseAuctionResponse(true, null, winnerUser);
                             } else {
                                 response = new BasicResponse(false, Errors.GENERAL_ERROR);
                             }
@@ -134,7 +136,7 @@ public class FeaturesController extends MainController {
     }
 
     @RequestMapping(value = "add-new-product", method = RequestMethod.POST)
-    public BasicResponse addNewProduct(String token, Integer userId, String name, String description, String logoUrl, Integer startingPrice) {
+    public BasicResponse addNewProduct(String token, Integer userId, String name, String description, Date openingSaleDate, String logoUrl, Integer startingPrice) {
         BasicResponse response;
         name = name.trim();
         description = description.trim();
@@ -149,7 +151,7 @@ public class FeaturesController extends MainController {
                                 if (startingPrice != null) {
                                     if (startingPrice % 1 == 0) {
                                         User user = persist.getUserByToken(token);
-                                        Product product = new Product(name, logoUrl, description, startingPrice, user);
+                                        Product product = new Product(name, logoUrl, description, openingSaleDate , startingPrice, user);
                                         persist.saveProduct(product);
                                         response = new BasicResponse(true, null);
                                     } else {

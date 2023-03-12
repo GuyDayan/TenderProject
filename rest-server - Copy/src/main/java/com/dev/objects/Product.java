@@ -17,7 +17,8 @@ public class Product {
     private String logoUrl;
     @Column
     private String description;
-
+    @Column(name = "opening_sale_date")
+    private Date openingSaleDate;
     @Column(name = "creation_date")
     private Date creationDate;
     @Column(name = "starting_price")
@@ -38,14 +39,23 @@ public class Product {
 
     }
 
-    public Product(String name, String logoUrl, String description, Integer startingPrice, User sellerUser) {
+    public Product(String name, String logoUrl, String description, Date openingSaleDate ,Integer startingPrice, User sellerUser) {
         this.name = name;
         this.logoUrl = logoUrl;
         this.description = description;
         this.startingPrice = startingPrice;
         this.sellerUser = sellerUser;
+        this.openingSaleDate = openingSaleDate;
         this.creationDate = new Date();
         this.openForSale = true;
+    }
+
+    public Date getOpeningSaleDate() {
+        return openingSaleDate;
+    }
+
+    public void setOpeningSaleDate(Date openingSaleDate) {
+        this.openingSaleDate = openingSaleDate;
     }
 
     public int getId() {
@@ -110,5 +120,13 @@ public class Product {
 
     public void setSellerUser(User sellerUser) {
         this.sellerUser = sellerUser;
+    }
+
+    public User getWinnerUserId() {
+        return winnerUserId;
+    }
+
+    public void setWinnerUserId(User winnerUserId) {
+        this.winnerUserId = winnerUserId;
     }
 }

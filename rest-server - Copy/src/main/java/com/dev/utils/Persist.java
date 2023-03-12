@@ -165,7 +165,7 @@ public class Persist {
     }
 
 
-    public List<Bid> getBidsByProductIdAsc(Integer productId) {
+    public List<Bid> getBidsByProductIdBidDateAsc(Integer productId) {
         Session session = sessionFactory.openSession();
         List<Bid> bids =
                 session.createQuery("FROM Bid WHERE product.id =:productId ORDER BY bidDate ASC")
@@ -187,9 +187,19 @@ public class Persist {
         return maxOffer;
     }
 
-    public Bid saveBid(Bid bid) {
+    public void saveBid(Bid bid) {
         Session session = sessionFactory.openSession();
         session.save(bid);
+        session.close();
+    }
+
+    public void saveWinnerUser(Integer productId , User winnerUser) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        Product product = session.get(Product.class,productId);
+        product.setWinnerUserId(winnerUser);
+        session.update(product);
+        transaction.commit();
         session.close();
     }
 }
