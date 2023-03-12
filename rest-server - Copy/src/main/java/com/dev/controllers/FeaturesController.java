@@ -35,6 +35,15 @@ public class FeaturesController extends MainController {
         }
         return response;
     }
+    @RequestMapping(value = "get-my-bids" , method = RequestMethod.GET)
+    public BasicResponse getMyBids(String token, Integer userId){
+        BasicResponse response = basicValidation(token, userId);
+        if (response.isSuccess()){
+            List<Bid> bids = persist.getBidsBySellerUserId(userId);
+            //response = new
+        }
+        return null;
+    }
 
     @RequestMapping(value = "place-bid", method = RequestMethod.POST)
     public BasicResponse placeBid(String token, Integer userId, Integer productId, int offer) {
@@ -136,7 +145,7 @@ public class FeaturesController extends MainController {
     }
 
     @RequestMapping(value = "add-new-product", method = RequestMethod.POST)
-    public BasicResponse addNewProduct(String token, Integer userId, String name, String description, Date openingSaleDate, String logoUrl, Integer startingPrice) {
+    public BasicResponse addNewProduct(String token, Integer userId, String name, String description, String logoUrl, Integer startingPrice) {
         BasicResponse response;
         name = name.trim();
         description = description.trim();
@@ -151,7 +160,7 @@ public class FeaturesController extends MainController {
                                 if (startingPrice != null) {
                                     if (startingPrice % 1 == 0) {
                                         User user = persist.getUserByToken(token);
-                                        Product product = new Product(name, logoUrl, description, openingSaleDate , startingPrice, user);
+                                        Product product = new Product(name, logoUrl, description, startingPrice, user);
                                         persist.saveProduct(product);
                                         response = new BasicResponse(true, null);
                                     } else {

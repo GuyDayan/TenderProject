@@ -9,7 +9,9 @@ import org.springframework.stereotype.Component;
 import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static com.dev.utils.Definitions.MINIMAL_PASSWORD_LENGTH;
@@ -17,6 +19,8 @@ import static com.dev.utils.Definitions.MINIMAL_USERNAME_LENGTH;
 
 @Component
 public class Utils {
+
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
 
     public String createHash (String username, String password) {
@@ -38,7 +42,9 @@ public class Utils {
     public boolean isStrongPassword (String password) {
         return password.length() >= MINIMAL_PASSWORD_LENGTH;
     }
-
+    public String formatDate(Date date){
+        return simpleDateFormat.format(date);
+    }
 
     public boolean isValidUsername(String username){
         return username.length() >= MINIMAL_USERNAME_LENGTH

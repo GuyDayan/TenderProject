@@ -1,5 +1,7 @@
 package com.dev.objects;
 
+import com.dev.utils.Definitions;
+
 import javax.persistence.*;
 
 @Entity
@@ -39,6 +41,7 @@ public class User {
     public User(String username, String token) {
         this.username = username;
         this.token = token;
+        this.credit = Definitions.INITIAL_CREDIT;
     }
 
     public int getId() {

@@ -19,8 +19,6 @@ public class Product {
     private String description;
     @Column(name = "opening_sale_date")
     private Date openingSaleDate;
-    @Column(name = "creation_date")
-    private Date creationDate;
     @Column(name = "starting_price")
     private Integer startingPrice;
     @ManyToOne
@@ -39,14 +37,13 @@ public class Product {
 
     }
 
-    public Product(String name, String logoUrl, String description, Date openingSaleDate ,Integer startingPrice, User sellerUser) {
+    public Product(String name, String logoUrl, String description ,Integer startingPrice, User sellerUser) {
         this.name = name;
         this.logoUrl = logoUrl;
         this.description = description;
         this.startingPrice = startingPrice;
         this.sellerUser = sellerUser;
-        this.openingSaleDate = openingSaleDate;
-        this.creationDate = new Date();
+        this.openingSaleDate = new Date();
         this.openForSale = true;
     }
 
@@ -90,13 +87,6 @@ public class Product {
         this.description = description;
     }
 
-    public Date getCreationDate() {
-        return creationDate;
-    }
-
-    public void setCreationDate(Date creationDate) {
-        this.creationDate = creationDate;
-    }
 
     public Integer getStartingPrice() {
         return startingPrice;
