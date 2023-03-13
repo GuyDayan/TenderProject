@@ -42,7 +42,7 @@ public class LoginController {
                                 if (email!=null){
                                     User fromDb = persist.getUserByUsername(username);
                                     if (fromDb == null) {
-                                        User toAdd = new User(username, utils.createHash(username, password));
+                                        User toAdd = new User(username, utils.createHash(username, password),fullName,email);
                                         persist.saveUser(toAdd);
                                         success = true;
                                     } else {
