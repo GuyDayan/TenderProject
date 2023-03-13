@@ -98,10 +98,11 @@ public class Persist {
         return user;
     }
 
-    public void saveProduct(Product product){
+    public void addProduct(Product product , Integer userId , int creditBalance){
         Session session = sessionFactory.openSession();
         session.save(product);
         session.close();
+        updateUserCredit(userId,creditBalance);
     }
 
     public boolean userHasPermissions(int userId, String token) {
@@ -174,12 +175,12 @@ public class Persist {
         return bids;
     }
 
-    public Integer getBiggestBidOnProduct(Integer productId) {
+    public Integer getBiggestBidOnProduct(Integer userId , Integer productId) {
         Integer maxOffer = null;
         Session session = sessionFactory.openSession();
         List<Bid> bids =
-                session.createQuery("FROM Bid WHERE product.id =:productId ORDER BY offer DESC")
-                        .setParameter("productId", productId).list();
+                session.createQuery("FROM Bid WHERE product.id =:productId AND buyerUser.id =:userId ORDER BY offer DESC")
+                        .setParameter("productId", productId).setParameter("userId", userId).list();
         session.close();
         if (!(bids.size() == 0)){
             maxOffer = bids.get(0).getOffer();
@@ -187,18 +188,72 @@ public class Persist {
         return maxOffer;
     }
 
-    public void saveBid(Bid bid) {
+    public void placeBid(Bid bid,Integer userId, Integer creditBalance) {
         Session session = sessionFactory.openSession();
         session.save(bid);
         session.close();
+        updateUserCredit(userId,creditBalance);
+    }
+
+
+
+
+    public List<Bid> getBuyerBidsOrderByDataAsc(Integer userId) {
+        Session session = sessionFactory.openSession();
+        List<Bid> bids =
+                session.createQuery("FROM Bid WHERE buyerUser.id =:userId ORDER BY bidDate ASC")
+                        .setParameter("userId",userId).list();
+        session.close();
+        return bids;
+    }
+
+    public List<Product> getWinningProducts(Integer userId) {
+        Session session = sessionFactory.openSession();
+        List<Product> products =
+                session.createQuery("FROM Product WHERE winnerUser.id =:userId AND openForSale=FALSE")
+                        .setParameter("userId",userId).list();
+        session.close();
+        return products;
     }
 
     public void saveWinnerUser(Integer productId , User winnerUser) {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
         Product product = session.get(Product.class,productId);
-        product.setWinnerUserId(winnerUser);
+        product.setWinnerUser(winnerUser);
         session.update(product);
+        transaction.commit();
+        session.close();
+    }
+
+
+
+
+
+    public Integer getUserCredit(String token, Integer userId) {
+        Session session = sessionFactory.openSession();
+        User user =
+                (User) session.createQuery("FROM User WHERE id =:userId AND token=: token")
+                        .setParameter("userId",userId).setParameter("token",token).uniqueResult();
+        session.close();
+        return user.getCredit();
+    }
+
+    public Bid getWinningBid(Integer winnerUserId, Integer closedProductId) {
+        Session session = sessionFactory.openSession();
+       Bid bid =
+               (Bid) session.createQuery("FROM Bid WHERE buyerUser.id =: winnerUserId AND product.id=: closedProductId")
+                        .setParameter("winnerUserId",winnerUserId).setParameter("closedProductId",closedProductId).uniqueResult();
+        session.close();
+        return bid;
+    }
+
+    public void updateUserCredit(Integer userId, Integer creditBalance) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        User user = session.get(User.class,userId);
+        user.setCredit(creditBalance);
+        session.update(user);
         transaction.commit();
         session.close();
     }

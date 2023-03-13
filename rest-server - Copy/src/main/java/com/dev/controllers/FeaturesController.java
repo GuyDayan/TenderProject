@@ -1,7 +1,6 @@
 package com.dev.controllers;
 
 import com.dev.models.MyProductsModel;
-import com.dev.models.ProductDetailsModel;
 import com.dev.objects.*;
 import com.dev.responses.*;
 import com.dev.utils.Definitions;
@@ -13,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -39,10 +38,12 @@ public class FeaturesController extends MainController {
     public BasicResponse getMyBids(String token, Integer userId){
         BasicResponse response = basicValidation(token, userId);
         if (response.isSuccess()){
-            List<Bid> bids = persist.getBidsBySellerUserId(userId);
-            //response = new
+            List<Bid> bids = persist.getBuyerBidsOrderByDataAsc(userId);
+            List<Product> winningProducts = persist.getWinningProducts(userId);
+            Map<Bid,Boolean> bidsWinsMap = utils.calculateBidsWinsMap(bids,winningProducts);
+            response = new MyBidsResponse(true,null,bidsWinsMap);
         }
-        return null;
+        return response;
     }
 
     @RequestMapping(value = "place-bid", method = RequestMethod.POST)
@@ -54,14 +55,20 @@ public class FeaturesController extends MainController {
                 if (product != null) {
                     if (product.getSellerUser().getId() != userId) {
                         if (product.isOpenForSale()) {
-                            Integer maxBidOffer = persist.getBiggestBidOnProduct(productId);
-                            User buyerUser = persist.getUserById(userId);
-                            Bid bid = new Bid(buyerUser, product, offer);
-                            if ((maxBidOffer != null && offer > maxBidOffer) || (maxBidOffer == null && offer > product.getStartingPrice())) {
-                                persist.saveBid(bid);
-                                response = new BasicResponse(true, null);
-                            } else {
-                                response = new BasicResponse(false, Errors.ERROR_OFFER_LOW);
+                            int creditBalance = persist.getUserCredit(token,userId) - offer;
+                            if (creditBalance >= 0){
+                                Integer maxBidOffer = persist.getBiggestBidOnProduct(userId,productId);
+                                User buyerUser = persist.getUserById(userId);
+                                Bid bid = new Bid(buyerUser, product, offer);
+                                if ((maxBidOffer != null && offer > maxBidOffer) || (maxBidOffer == null && offer > product.getStartingPrice())) {
+                                    persist.placeBid(bid,userId,creditBalance-Definitions.BID_COST_FEE);
+                                    response = new BasicResponse(true, null);
+                                } else {
+                                    response = new BasicResponse(false, Errors.ERROR_OFFER_LOW);
+                                }
+                            }else {
+                                response = new BasicResponse(false, Errors.ERROR_NOT_ENOUGH_CREDIT);
+
                             }
                         } else {
                             response = new BasicResponse(false, Errors.ERROR_PRODUCT_NOT_ON_SALE);
@@ -120,9 +127,19 @@ public class FeaturesController extends MainController {
                         if (bidsOnProductAsc.size() >= Definitions.MIN_BIDS_FOR_CLOSE_AUCTION) {
                             Product closedProduct = persist.closeAuction(productId);
                             if (!closedProduct.isOpenForSale()) {
+                                // update winner user , if winner user charge seller 5% of offer
                                 User winnerUser = utils.checkForAuctionWinner(bidsOnProductAsc, product);
                                 persist.saveWinnerUser(closedProduct.getId(),winnerUser);
-                                response = new CloseAuctionResponse(true, null, winnerUser);
+                                if (winnerUser!=null){
+                                    Bid bid = persist.getWinningBid(winnerUser.getId(),closedProduct.getId());
+                                    User sellerUser = bid.getSellerUser();
+                                    Integer winnerUserCreditBalance = winnerUser.getCredit() - bid.getOffer();
+                                    double profitCredit = (bid.getOffer()*Definitions.PRODUCT_SELL_PROFIT_PERCENT);
+                                    Integer sellerUserCreditBalance = sellerUser.getCredit() + (int) profitCredit;
+                                    persist.updateUserCredit(winnerUser.getId() , winnerUserCreditBalance);
+                                    persist.updateUserCredit(sellerUser.getId() , sellerUserCreditBalance);
+                                }
+                                response = new BasicResponse(true, null);
                             } else {
                                 response = new BasicResponse(false, Errors.GENERAL_ERROR);
                             }
@@ -159,10 +176,16 @@ public class FeaturesController extends MainController {
                                 // add check to valid logo url
                                 if (startingPrice != null) {
                                     if (startingPrice % 1 == 0) {
-                                        User user = persist.getUserByToken(token);
-                                        Product product = new Product(name, logoUrl, description, startingPrice, user);
-                                        persist.saveProduct(product);
-                                        response = new BasicResponse(true, null);
+                                        int creditBalance = persist.getUserCredit(token,userId) - Definitions.ADD_PRODUCT_FEE;
+                                        if (creditBalance >= 0){
+                                            User user = persist.getUserByToken(token);
+                                            Product product = new Product(name, logoUrl, description, startingPrice, user);
+                                            persist.addProduct(product,userId, creditBalance);
+                                            response = new BasicResponse(true, null);
+                                        }else {
+                                            response = new BasicResponse(false, Errors.ERROR_NOT_ENOUGH_CREDIT);
+                                        }
+
                                     } else {
                                         response = new BasicResponse(false, Errors.PRODUCT_STARTING_PRICE_MUST_BE_INTEGER);
 

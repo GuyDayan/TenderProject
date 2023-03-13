@@ -19,7 +19,10 @@ public class Errors {
 
     public static final int ERROR_PRODUCT_NOT_ON_SALE = 90;
 
-    public static final int ERROR_OFFER_LOW = 90;
+    public static final int ERROR_OFFER_LOW = 91;
+
+    public static final int ERROR_NOT_ENOUGH_CREDIT = 92;
+
 
 
 

@@ -10,9 +10,7 @@ import javax.xml.bind.DatatypeConverter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 import static com.dev.utils.Definitions.MINIMAL_PASSWORD_LENGTH;
 import static com.dev.utils.Definitions.MINIMAL_USERNAME_LENGTH;
@@ -79,4 +77,37 @@ public class Utils {
         }
         return winnerUser;
     }
+
+    public Map<Bid, Boolean> calculateBidsWinsMap(List<Bid> bids, List<Product> winningProducts) {
+        Map<Bid, Boolean> bidsWinsMap = new HashMap<>();
+        for (Product product : winningProducts){
+            Bid highestBid = null;
+            for (Bid bid : bids){
+                if (bid.getProduct().getId() == product.getId()){
+                    if (highestBid == null){
+                        highestBid = bid;
+                        bidsWinsMap.put(highestBid , true);
+                    }else {
+                        if (bid.getOffer() > highestBid.getOffer()){
+                            for (Map.Entry<Bid, Boolean> entry : bidsWinsMap.entrySet()) {
+                                if (entry.getKey().equals(highestBid)) {
+                                    entry.setValue(false);
+                                    break;
+                                }
+                            }
+                            highestBid = bid;
+                            bidsWinsMap.put(highestBid,true);
+                        }else {
+                            bidsWinsMap.put(bid,false);
+                        }
+                    }
+
+                }
+            }
+        }
+        return bidsWinsMap;
+    }
+
+
+
 }

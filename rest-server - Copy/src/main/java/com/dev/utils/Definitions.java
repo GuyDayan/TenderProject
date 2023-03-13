@@ -17,5 +17,8 @@ public class Definitions {
     public static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
 
+    public static final int BID_COST_FEE = 1;
 
+    public static final int ADD_PRODUCT_FEE = 2;
+    public static final double PRODUCT_SELL_PROFIT_PERCENT = 0.95;
 }

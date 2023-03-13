@@ -3,6 +3,7 @@ package com.dev.objects;
 import com.dev.utils.Definitions;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table (name = "users")
@@ -24,24 +25,27 @@ public class User {
     @Column(name = "full_name")
     private String fullName;
 
-    @Column
-    private String creation_date;
+    @Column(name = "creation_date")
+    private Date creationDate;
 
 
     @Column(name = "last_login")
     private String lastLogin;
 
     @Column
-    private double credit;
+    private Integer credit;
 
 
     public User() {
     }
 
-    public User(String username, String token) {
+    public User(String username, String token,String fullName,String email) {
         this.username = username;
         this.token = token;
+        this.fullName = fullName;
+        this.email = email;
         this.credit = Definitions.INITIAL_CREDIT;
+        this.creationDate = new Date();
     }
 
     public int getId() {
@@ -66,5 +70,45 @@ public class User {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(Date creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public String getLastLogin() {
+        return lastLogin;
+    }
+
+    public void setLastLogin(String lastLogin) {
+        this.lastLogin = lastLogin;
+    }
+
+    public Integer getCredit() {
+        return credit;
+    }
+
+    public void setCredit(Integer credit) {
+        this.credit = credit;
     }
 }

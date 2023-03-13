@@ -12,7 +12,6 @@ public class Bid {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     private int id;
-
     @ManyToOne
     @JoinColumn(name = "user_seller_id")
     private User sellerUser;
@@ -24,10 +23,8 @@ public class Bid {
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
-
     @Column
     private Integer offer;
-
     @Column(name = "bid_date")
     private Date bidDate;
 

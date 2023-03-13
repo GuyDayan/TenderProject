@@ -1,5 +1,7 @@
 package com.dev.models;
 
+import com.dev.objects.Bid;
+
 public class MyBidsModel {
     private int productId;
     private String productName;
@@ -7,12 +9,12 @@ public class MyBidsModel {
     private boolean openForSale;
     private boolean bidWinning;
 
-    public MyBidsModel(int productId, String productName, int offer, boolean openForSale, boolean bidWinning) {
-        this.productId = productId;
-        this.productName = productName;
-        this.offer = offer;
-        this.openForSale = openForSale;
-        this.bidWinning = bidWinning;
+    public MyBidsModel(Bid bid , Boolean isWinning) {
+        this.productId = bid.getProduct().getId();
+        this.productName = bid.getProduct().getName();
+        this.offer = bid.getOffer();
+        this.openForSale = bid.getProduct().isOpenForSale();
+        this.bidWinning = isWinning;
     }
 
     public int getProductId() {

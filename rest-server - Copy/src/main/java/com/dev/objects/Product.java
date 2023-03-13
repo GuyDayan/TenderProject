@@ -24,13 +24,12 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "seller_user_id")
     private User sellerUser;
+    @Column(name = "is_open_for_sale")
+    private boolean openForSale;
 
     @ManyToOne
     @JoinColumn(name = "winner_user_id")
-    private User winnerUserId;
-
-    @Column(name = "is_open_for_sale")
-    private boolean openForSale;
+    private User winnerUser;
 
 
     public Product(){
@@ -112,11 +111,11 @@ public class Product {
         this.sellerUser = sellerUser;
     }
 
-    public User getWinnerUserId() {
-        return winnerUserId;
+    public User getWinnerUser() {
+        return winnerUser;
     }
 
-    public void setWinnerUserId(User winnerUserId) {
-        this.winnerUserId = winnerUserId;
+    public void setWinnerUser(User winnerUser) {
+        this.winnerUser = winnerUser;
     }
 }
