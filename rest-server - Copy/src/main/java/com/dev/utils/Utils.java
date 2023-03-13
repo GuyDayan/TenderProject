@@ -78,35 +78,44 @@ public class Utils {
         return winnerUser;
     }
 
-    public Map<Bid, Boolean> calculateBidsWinsMap(List<Bid> bids, List<Product> winningProducts) {
-        Map<Bid, Boolean> bidsWinsMap = new HashMap<>();
-        for (Product product : winningProducts){
-            Bid highestBid = null;
+    public Map<Bid, Boolean> calculateBidsStatusMap(List<Bid> bids, List<Product> winningProducts) {
+        Map<Bid, Boolean> bidsStatusMap = new HashMap<>();
+        if (winningProducts.size() == 0){
             for (Bid bid : bids){
-                if (bid.getProduct().getId() == product.getId()){
-                    if (highestBid == null){
-                        highestBid = bid;
-                        bidsWinsMap.put(highestBid , true);
-                    }else {
-                        if (bid.getOffer() > highestBid.getOffer()){
-                            for (Map.Entry<Bid, Boolean> entry : bidsWinsMap.entrySet()) {
-                                if (entry.getKey().equals(highestBid)) {
-                                    entry.setValue(false);
-                                    break;
-                                }
-                            }
-                            highestBid = bid;
-                            bidsWinsMap.put(highestBid,true);
-                        }else {
-                            bidsWinsMap.put(bid,false);
-                        }
-                    }
-
-                }
+                bidsStatusMap.put(bid,false);
             }
+        }else {
+            for (Product product : winningProducts){
+                Bid highestBid = null;
+                for (Bid bid : bids){
+                    if (bid.getProduct().getId() == product.getId()){
+                        if (highestBid == null){
+                            highestBid = bid;
+                            bidsStatusMap.put(highestBid , true);
+                        }else {
+                            if (bid.getOffer() > highestBid.getOffer()){
+                                for (Map.Entry<Bid, Boolean> entry : bidsStatusMap.entrySet()) {
+                                    if (entry.getKey().equals(highestBid)) {
+                                        entry.setValue(false);
+                                        break;
+                                    }
+                                }
+                                highestBid = bid;
+                                bidsStatusMap.put(highestBid,true);
+                            }else {
+                                bidsStatusMap.put(bid,false);
+                            }
+                        }
+
+                    }
+                }
         }
-        return bidsWinsMap;
+
+        }
+        return bidsStatusMap;
     }
+
+
 
 
 

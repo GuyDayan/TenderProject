@@ -139,6 +139,15 @@ public class Persist {
         return bids;
     }
 
+    public List<Bid> getBidsByBuyerUserId(Integer userId) {
+        Session session = sessionFactory.openSession();
+        List<Bid> bids =
+                session.createQuery("FROM Bid WHERE buyerUser.id =:userId")
+                        .setParameter("userId", userId).list();
+        session.close();
+        return bids;
+    }
+
     public Product productIsExist(Integer productId) {
         Session session = sessionFactory.openSession();
         return (Product) session.createQuery("FROM Product where id =:productId").setParameter("productId"  , productId).uniqueResult();

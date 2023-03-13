@@ -1,26 +1,28 @@
 package com.dev.responses;
 
+import com.dev.models.AllUsersModel;
 import com.dev.objects.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AllUsersResponse extends BasicResponse {
-    private List<User> users;
+    private List<AllUsersModel> users = new ArrayList<>();
 
-    public AllUsersResponse(List<User> users) {
-        this.users = users;
-    }
+
 
     public AllUsersResponse(boolean success, Integer errorCode, List<User> users) {
         super(success, errorCode);
-        this.users = users;
+        for (User user : users){
+            this.users.add(new AllUsersModel(user));
+        }
     }
 
-    public List<User> getUsers() {
+    public List<AllUsersModel> getUsers() {
         return users;
     }
 
-    public void setUsers(List<User> users) {
+    public void setUsers(List<AllUsersModel> users) {
         this.users = users;
     }
 }

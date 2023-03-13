@@ -40,8 +40,8 @@ public class FeaturesController extends MainController {
         if (response.isSuccess()){
             List<Bid> bids = persist.getBuyerBidsOrderByDataAsc(userId);
             List<Product> winningProducts = persist.getWinningProducts(userId);
-            Map<Bid,Boolean> bidsWinsMap = utils.calculateBidsWinsMap(bids,winningProducts);
-            response = new MyBidsResponse(true,null,bidsWinsMap);
+            Map<Bid,Boolean> bidsStatusMap = utils.calculateBidsStatusMap(bids,winningProducts);
+            response = new MyBidsResponse(true,null,bidsStatusMap);
         }
         return response;
     }
