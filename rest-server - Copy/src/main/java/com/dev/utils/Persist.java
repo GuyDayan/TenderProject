@@ -174,6 +174,16 @@ public class Persist {
 
     }
 
+    public List<Product> getMyProductsForSale(Integer userId) {
+        Session session = sessionFactory.openSession();
+        List<Product> products =
+                session.createQuery("FROM Product WHERE sellerUser.id =: userId")
+                        .setParameter("userId", userId).list();
+        session.close();
+        return products;
+
+    }
+
 
     public List<Bid> getBidsByProductIdBidDateAsc(Integer productId) {
         Session session = sessionFactory.openSession();

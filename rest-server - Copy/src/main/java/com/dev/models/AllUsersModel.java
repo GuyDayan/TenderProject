@@ -1,5 +1,6 @@
 package com.dev.models;
 import com.dev.objects.User;
+import com.dev.utils.Definitions;
 
 import java.util.Date;
 
@@ -8,7 +9,7 @@ public class AllUsersModel {
     private int id;
     private String username;
     private String email;
-    private Date creationDate;
+    private String creationDate;
     private String lastLogin;
 
 
@@ -16,7 +17,7 @@ public class AllUsersModel {
         this.id = user.getId();
         this.username = user.getUsername();
         this.email = user.getEmail();
-        this.creationDate =user.getCreationDate();
+        this.creationDate = Definitions.simpleDateFormat.format(user.getCreationDate());
         this.lastLogin = user.getLastLogin();
     }
 
@@ -44,11 +45,11 @@ public class AllUsersModel {
         this.email = email;
     }
 
-    public Date getCreationDate() {
+    public String getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(Date creationDate) {
+    public void setCreationDate(String creationDate) {
         this.creationDate = creationDate;
     }
 

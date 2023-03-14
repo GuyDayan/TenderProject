@@ -28,7 +28,7 @@ public class ManageController extends MainController{
     @RequestMapping (value = "get-user-details", method = RequestMethod.GET)
     public BasicResponse getUserDetails (Integer userId) {
         User user = persist.getUserById(userId);
-        int totalBids = persist.getBidsByBuyerUserId(userId).size();
-        return new UserDetailsResponse(true,null,user,totalBids);
+        int totalAuctions = persist.getMyProductsForSale(userId).size();
+        return new UserDetailsResponse(true,null,user,totalAuctions);
     }
 }

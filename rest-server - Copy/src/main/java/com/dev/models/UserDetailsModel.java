@@ -6,13 +6,14 @@ public class UserDetailsModel {
 
     private String username;
 
-    private int totalBids;
+
+    private int totalAuctions;
 
     private int credit;
 
-    public UserDetailsModel(User user , int totalBids) {
+    public UserDetailsModel(User user , int totalAuctions) {
         this.username = user.getUsername();
-        this.totalBids = totalBids;
+        this.totalAuctions = totalAuctions;
         this.credit = user.getCredit();
     }
 
@@ -24,12 +25,12 @@ public class UserDetailsModel {
         this.username = username;
     }
 
-    public int getTotalBids() {
-        return totalBids;
+    public int getTotalAuctions() {
+        return totalAuctions;
     }
 
-    public void setTotalBids(int totalBids) {
-        this.totalBids = totalBids;
+    public void setTotalAuctions(int totalAuctions) {
+        this.totalAuctions = totalAuctions;
     }
 
     public int getCredit() {
