@@ -1,6 +1,7 @@
 package com.dev.models;
 
 import com.dev.objects.Product;
+import com.dev.utils.Definitions;
 
 public class ProductsForSaleModel {
 
@@ -8,13 +9,44 @@ public class ProductsForSaleModel {
     private int id;
     private String name;
     private String logoUrl;
-    private boolean isOpenForSale;
 
-    public ProductsForSaleModel(Product product) {
+    private String openingSaleDate;
+
+    private int totalBids;
+
+    private int myTotalBids;
+
+    public ProductsForSaleModel(Product product , int totalBids , int myTotalBids) {
         this.id = product.getId();
         this.name = product.getName();
         this.logoUrl = product.getLogoUrl();
-        this.isOpenForSale = product.isOpenForSale();
+        this.openingSaleDate = Definitions.simpleDateFormat.format(product.getOpeningSaleDate());
+        this.totalBids = totalBids;
+        this.myTotalBids = myTotalBids;
+    }
+
+    public int getTotalBids() {
+        return totalBids;
+    }
+
+    public void setTotalBids(int totalBids) {
+        this.totalBids = totalBids;
+    }
+
+    public int getMyTotalBids() {
+        return myTotalBids;
+    }
+
+    public void setMyTotalBids(int myTotalBids) {
+        this.myTotalBids = myTotalBids;
+    }
+
+    public String getOpeningSaleDate() {
+        return openingSaleDate;
+    }
+
+    public void setOpeningSaleDate(String openingSaleDate) {
+        this.openingSaleDate = openingSaleDate;
     }
 
     public int getId() {
@@ -41,11 +73,4 @@ public class ProductsForSaleModel {
         this.logoUrl = logoUrl;
     }
 
-    public boolean isOpenForSale() {
-        return isOpenForSale;
-    }
-
-    public void setOpenForSale(boolean openForSale) {
-        isOpenForSale = openForSale;
-    }
 }

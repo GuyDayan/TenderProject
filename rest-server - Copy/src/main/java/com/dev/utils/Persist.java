@@ -167,7 +167,7 @@ public class Persist {
     public List<Product> getProductsForSale(Integer userId) {
         Session session = sessionFactory.openSession();
         List<Product> products =
-                session.createQuery("FROM Product WHERE sellerUser.id != :userId")
+                session.createQuery("FROM Product WHERE sellerUser.id != :userId AND openForSale=TRUE ")
                         .setParameter("userId", userId).list();
         session.close();
         return products;
@@ -275,5 +275,13 @@ public class Persist {
         session.update(user);
         transaction.commit();
         session.close();
+    }
+
+    public List<Bid> getBidsOnActiveAuctions(Integer userId) {
+        Session session = sessionFactory.openSession();
+        List<Bid> bids =
+                session.createQuery("FROM Bid WHERE product.openForSale=TRUE").list();
+        session.close();
+        return bids;
     }
 }

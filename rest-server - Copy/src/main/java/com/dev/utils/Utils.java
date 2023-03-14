@@ -4,6 +4,7 @@ import com.dev.models.MyProductsModel;
 import com.dev.objects.Bid;
 import com.dev.objects.Product;
 import com.dev.objects.User;
+import com.dev.pojo.TotalBidsCounter;
 import org.springframework.stereotype.Component;
 
 import javax.xml.bind.DatatypeConverter;
@@ -78,6 +79,8 @@ public class Utils {
         return winnerUser;
     }
 
+
+
     public Map<Bid, Boolean> calculateBidsStatusMap(List<Bid> bids, List<Product> winningProducts) {
         Map<Bid, Boolean> bidsStatusMap = new HashMap<>();
         if (winningProducts.size() == 0){
@@ -116,7 +119,20 @@ public class Utils {
     }
 
 
-
-
-
+    public Map<Product,TotalBidsCounter> calculateProductsBidsMap(List<Product> productsForSale, List<Bid> bidsOnActiveAuctions , Integer userId) {
+        Map<Product,TotalBidsCounter> totalBidsCounterMap = new HashMap<>();
+        for (Product product : productsForSale){
+            TotalBidsCounter totalBidsCounter = new TotalBidsCounter(0,0);
+            for (Bid bid : bidsOnActiveAuctions){
+                if (bid.getProduct().getId() == product.getId()){
+                    if (bid.getBuyerUser().getId() == userId){
+                        totalBidsCounter.setUserTotalBids(totalBidsCounter.getUserTotalBids() + 1);
+                    }
+                    totalBidsCounter.setAllUsersTotalBids(totalBidsCounter.getAllUsersTotalBids()+1);
+                }
+            }
+            totalBidsCounterMap.put(product,totalBidsCounter);
+        }
+        return totalBidsCounterMap;
+    }
 }

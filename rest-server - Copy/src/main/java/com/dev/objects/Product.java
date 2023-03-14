@@ -118,4 +118,6 @@ public class Product {
     public void setWinnerUser(User winnerUser) {
         this.winnerUser = winnerUser;
     }
+
+
 }

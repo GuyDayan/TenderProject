@@ -2,18 +2,20 @@ package com.dev.responses;
 
 import com.dev.models.ProductsForSaleModel;
 import com.dev.objects.Product;
+import com.dev.pojo.TotalBidsCounter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ProductsForSaleResponse extends BasicResponse{
 
     private List<ProductsForSaleModel> products = new ArrayList<>();
 
-    public ProductsForSaleResponse(boolean success, Integer errorCode, List<Product> products) {
+    public ProductsForSaleResponse(boolean success, Integer errorCode, Map<Product, TotalBidsCounter> productsBidsMap) {
         super(success, errorCode);
-        for (Product product: products){
-            this.products.add(new ProductsForSaleModel(product));
+        for (Map.Entry<Product , TotalBidsCounter> entry : productsBidsMap.entrySet()){
+            this.products.add(new ProductsForSaleModel(entry.getKey() , entry.getValue().getAllUsersTotalBids(), entry.getValue().getUserTotalBids()));
         }
     }
 

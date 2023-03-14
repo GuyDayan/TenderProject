@@ -2,6 +2,7 @@ package com.dev.controllers;
 
 import com.dev.models.MyProductsModel;
 import com.dev.objects.*;
+import com.dev.pojo.TotalBidsCounter;
 import com.dev.responses.*;
 import com.dev.utils.Definitions;
 import com.dev.utils.Errors;
@@ -108,7 +109,9 @@ public class FeaturesController extends MainController {
         BasicResponse response = basicValidation(token, userId);
         if (response.isSuccess()) {
             List<Product> productsForSale = persist.getProductsForSale(userId);
-            response = new ProductsForSaleResponse(true,null,productsForSale);
+            List<Bid> bidsOnActiveAuctions = persist.getBidsOnActiveAuctions(userId);
+            Map<Product, TotalBidsCounter>  productsBidsMap =  utils.calculateProductsBidsMap(productsForSale,bidsOnActiveAuctions,userId);
+            response = new ProductsForSaleResponse(true,null,productsBidsMap);
         }
         return response;
 

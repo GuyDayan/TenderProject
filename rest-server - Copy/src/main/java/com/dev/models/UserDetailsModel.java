@@ -6,7 +6,6 @@ public class UserDetailsModel {
 
     private String username;
 
-
     private int totalAuctions;
 
     private int credit;
