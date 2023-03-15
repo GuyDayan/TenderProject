@@ -1,6 +1,7 @@
 package com.dev.models;
 import com.dev.objects.User;
 import com.dev.utils.Definitions;
+import com.dev.utils.Utils;
 
 import java.util.Date;
 
@@ -17,7 +18,7 @@ public class AllUsersModel {
         this.id = user.getId();
         this.username = user.getUsername();
         this.email = user.getEmail();
-        this.creationDate = Definitions.simpleDateFormat.format(user.getCreationDate());
+        this.creationDate = Utils.simpleDateFormat.format(user.getCreationDate());
         this.lastLogin = user.getLastLogin();
     }
 

@@ -19,7 +19,7 @@ import static com.dev.utils.Definitions.MINIMAL_USERNAME_LENGTH;
 @Component
 public class Utils {
 
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+    public static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
 
     public String createHash (String username, String password) {
@@ -41,13 +41,12 @@ public class Utils {
     public boolean isStrongPassword (String password) {
         return password.length() >= MINIMAL_PASSWORD_LENGTH;
     }
-    public String formatDate(Date date){
+    public static String formatDate(Date date){
         return simpleDateFormat.format(date);
     }
 
     public boolean isValidUsername(String username){
-        return username.length() >= MINIMAL_USERNAME_LENGTH
-                && username.matches("[a-zA-Z]+");
+        return username.length() >= MINIMAL_USERNAME_LENGTH;
     }
 
     public List<MyProductsModel> calculateBiggestBids(List<Product> products , List<Bid> bids) {
@@ -128,7 +127,7 @@ public class Utils {
                     if (bid.getBuyerUser().getId() == userId){
                         totalBidsCounter.setUserTotalBids(totalBidsCounter.getUserTotalBids() + 1);
                     }
-                    totalBidsCounter.setAllUsersTotalBids(totalBidsCounter.getAllUsersTotalBids()+1);
+                    totalBidsCounter.setAllUsersTotalBids(totalBidsCounter.getAllUsersTotalBids() +1);
                 }
             }
             totalBidsCounterMap.put(product,totalBidsCounter);

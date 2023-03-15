@@ -36,7 +36,9 @@ public class User {
     private Integer credit;
 
 
+
     public User() {
+
     }
 
     public User(String username, String token,String fullName,String email) {
@@ -46,7 +48,10 @@ public class User {
         this.email = email;
         this.credit = Definitions.INITIAL_CREDIT;
         this.creationDate = new Date();
+
     }
+
+
 
     public int getId() {
         return id;

@@ -21,4 +21,6 @@ public class Definitions {
 
     public static final int ADD_PRODUCT_FEE = 2;
     public static final double PRODUCT_SELL_PROFIT_PERCENT = 0.95;
+
+
 }

@@ -2,6 +2,7 @@
 package com.dev.utils;
 
 import com.dev.objects.*;
+import com.sun.xml.bind.v2.model.core.EnumLeafInfo;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -276,6 +277,17 @@ public class Persist {
         transaction.commit();
         session.close();
     }
+    public void addToSystemCredit(Integer creditToAdd) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        AdminUser adminUser = (AdminUser) session.createQuery("FROM AdminUser").uniqueResult();
+        if (adminUser!=null){
+            adminUser.setCredit(adminUser.getCredit() + creditToAdd);
+        }
+        session.update(adminUser);
+        transaction.commit();
+        session.close();
+    }
 
     public List<Bid> getBidsOnActiveAuctions(Integer userId) {
         Session session = sessionFactory.openSession();
@@ -284,4 +296,24 @@ public class Persist {
         session.close();
         return bids;
     }
+
+    public AdminUser getAdminUser(String username , String password) {
+        Session session = sessionFactory.openSession();
+        AdminUser adminUser =
+                (AdminUser) session.createQuery("FROM AdminUser WHERE username=:username AND password=:password")
+                        .setParameter("username",username).setParameter("password", password).uniqueResult();
+        session.close();
+        return adminUser;
+    }
+
+    public AdminUser validateAdminToken(String uniqueToken){
+        Session session = sessionFactory.openSession();
+        AdminUser adminUser =
+                (AdminUser) session.createQuery("FROM AdminUser WHERE uniqueToken=: uniqueToken")
+                        .setParameter("uniqueToken",uniqueToken).uniqueResult();
+        session.close();
+        return adminUser;
+    }
+
+
 }

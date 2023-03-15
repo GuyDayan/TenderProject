@@ -63,6 +63,7 @@ public class FeaturesController extends MainController {
                                 Bid bid = new Bid(buyerUser, product, offer);
                                 if ((maxBidOffer != null && offer > maxBidOffer) || (maxBidOffer == null && offer > product.getStartingPrice())) {
                                     persist.placeBid(bid,userId,creditBalance-Definitions.BID_COST_FEE);
+                                    persist.addToSystemCredit(Definitions.BID_COST_FEE);
                                     response = new BasicResponse(true, null);
                                 } else {
                                     response = new BasicResponse(false, Errors.ERROR_OFFER_LOW);
@@ -137,17 +138,19 @@ public class FeaturesController extends MainController {
                                     Bid bid = persist.getWinningBid(winnerUser.getId(),closedProduct.getId());
                                     User sellerUser = bid.getSellerUser();
                                     Integer winnerUserCreditBalance = winnerUser.getCredit() - bid.getOffer();
-                                    double profitCredit = (bid.getOffer()*Definitions.PRODUCT_SELL_PROFIT_PERCENT);
-                                    Integer sellerUserCreditBalance = sellerUser.getCredit() + (int) profitCredit;
+                                    double sellerProfitCredit = (bid.getOffer()*Definitions.PRODUCT_SELL_PROFIT_PERCENT);
+                                    double systemProfitCredit = (bid.getOffer()* (1-Definitions.PRODUCT_SELL_PROFIT_PERCENT));
+                                    Integer sellerUserCreditBalance = sellerUser.getCredit() + (int) sellerProfitCredit;
                                     persist.updateUserCredit(winnerUser.getId() , winnerUserCreditBalance);
                                     persist.updateUserCredit(sellerUser.getId() , sellerUserCreditBalance);
+                                    persist.addToSystemCredit((int)systemProfitCredit);
                                 }
                                 response = new BasicResponse(true, null);
                             } else {
                                 response = new BasicResponse(false, Errors.GENERAL_ERROR);
                             }
                         } else {
-                            response = new BasicResponse(false, Errors.PRODUCT_HASNT_ENOUGH_BIDS);
+                            response = new BasicResponse(false, Errors.PRODUCT_HASNT_ENOUGH_BIDS_FOR_CLOSE);
                         }
                     } else {
                         response = new BasicResponse(false, Errors.ERROR_USER_DOESNT_OWNER);
@@ -184,13 +187,14 @@ public class FeaturesController extends MainController {
                                             User user = persist.getUserByToken(token);
                                             Product product = new Product(name, logoUrl, description, startingPrice, user);
                                             persist.addProduct(product,userId, creditBalance);
+                                            persist.addToSystemCredit(Definitions.ADD_PRODUCT_FEE);
                                             response = new BasicResponse(true, null);
                                         }else {
                                             response = new BasicResponse(false, Errors.ERROR_NOT_ENOUGH_CREDIT);
                                         }
 
                                     } else {
-                                        response = new BasicResponse(false, Errors.PRODUCT_STARTING_PRICE_MUST_BE_INTEGER);
+                                        response = new BasicResponse(false, Errors.ERROR_MUST_BE_INTEGER);
 
                                     }
                                 } else {

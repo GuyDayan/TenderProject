@@ -1,12 +1,10 @@
 package com.dev.objects;
 
-
 import javax.persistence.*;
 
 @Entity
-@Table(name = "admin_users")
+@Table (name = "admin_users")
 public class AdminUser {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,28 +15,32 @@ public class AdminUser {
     private String username;
 
     @Column
-    private String token;
+    private String password;
 
     @Column
-    private String email;
+    private Integer credit;
 
     @Column
-    private String creation_date;
+    private String uniqueToken;
 
-
-    @Column
-    private String last_login;
-
-
-    public AdminUser(String username, String token) {
+    public AdminUser(String username, String password , String uniqueToken) {
         this.username = username;
-        this.token = token;
+        this.password = password;
+        this.uniqueToken = uniqueToken;
+        this.credit = 0;
     }
 
     public AdminUser() {
 
     }
 
+    public Integer getCredit() {
+        return credit;
+    }
+
+    public void setCredit(Integer credit) {
+        this.credit = credit;
+    }
 
     public int getId() {
         return id;
@@ -56,35 +58,11 @@ public class AdminUser {
         this.username = username;
     }
 
-    public String getToken() {
-        return token;
+    public String getPassword() {
+        return password;
     }
 
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getCreation_date() {
-        return creation_date;
-    }
-
-    public void setCreation_date(String creation_date) {
-        this.creation_date = creation_date;
-    }
-
-    public String getLast_login() {
-        return last_login;
-    }
-
-    public void setLast_login(String last_login) {
-        this.last_login = last_login;
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

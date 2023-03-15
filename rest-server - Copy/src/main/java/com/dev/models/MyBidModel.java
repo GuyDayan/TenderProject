@@ -3,6 +3,7 @@ package com.dev.models;
 import com.dev.objects.Bid;
 import com.dev.objects.Product;
 import com.dev.objects.User;
+import com.dev.utils.Utils;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -21,7 +22,7 @@ public class MyBidModel {
         this.id = bid.getId();
         this.productId = bid.getProduct().getId();
         this.offer = bid.getOffer();
-        this.bidDate = simpleDateFormat.format(bid.getBidDate());
+        this.bidDate = Utils.simpleDateFormat.format(bid.getBidDate());
     }
 
     public int getId() {

@@ -2,6 +2,7 @@ package com.dev.models;
 
 import com.dev.objects.Product;
 import com.dev.utils.Definitions;
+import com.dev.utils.Utils;
 
 public class ProductsForSaleModel {
 
@@ -20,7 +21,7 @@ public class ProductsForSaleModel {
         this.id = product.getId();
         this.name = product.getName();
         this.logoUrl = product.getLogoUrl();
-        this.openingSaleDate = Definitions.simpleDateFormat.format(product.getOpeningSaleDate());
+        this.openingSaleDate = Utils.simpleDateFormat.format(product.getOpeningSaleDate());
         this.totalBids = totalBids;
         this.myTotalBids = myTotalBids;
     }

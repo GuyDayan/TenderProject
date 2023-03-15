@@ -1,6 +1,8 @@
 package com.dev.controllers;
 
+import com.dev.objects.AdminUser;
 import com.dev.objects.User;
+import com.dev.responses.AdminLoginResponse;
 import com.dev.responses.BasicResponse;
 import com.dev.responses.LoginResponse;
 import com.dev.utils.Persist;
@@ -105,4 +107,20 @@ public class LoginController {
         basicResponse.setErrorCode(errorCode);
         return basicResponse;
     }
+
+    @RequestMapping (value = "admin-login" , method = RequestMethod.POST)
+    public BasicResponse loginAdminUser (String username, String password) {
+        BasicResponse response = new BasicResponse(false,GENERAL_ERROR);
+        if (username!=null){
+            if (password!=null){
+                AdminUser adminUser = persist.getAdminUser(username, password);
+                String uniqueToken = utils.createHash(username,password);
+                if (adminUser!=null){
+                    response = new AdminLoginResponse(true,null,uniqueToken);
+                }
+            }
+        }
+        return response;
+    }
+
 }
