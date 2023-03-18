@@ -2,6 +2,8 @@ package com.dev.utils;
 
 public class Errors {
     public static final int  GENERAL_ERROR = 10;
+    public static final int  MISSING_PARAMS = 11;
+    public static final int NO_SUCH_USER = 12;
     public static final int PERMISSION_ERROR_CODE = 413;
     public static final int PRODUCT_NAME_REQUIRED = 80;
     public static final int PRODUCT_DESCRIPTION_REQUIRED = 81;
@@ -26,9 +28,7 @@ public class Errors {
 
 
 
-
-
-
+    public static final int ERROR_MISSING_USERTYPE = 999;
 
     public static final int ERROR_WEAK_USERNAME = 999;
     public static final int ERROR_MISSING_USERNAME = 1000;

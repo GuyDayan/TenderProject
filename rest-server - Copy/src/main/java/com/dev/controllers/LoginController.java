@@ -1,10 +1,11 @@
 package com.dev.controllers;
 
-import com.dev.objects.AdminUser;
+import com.dev.models.UserStatsModel;
 import com.dev.objects.User;
-import com.dev.responses.AdminLoginResponse;
 import com.dev.responses.BasicResponse;
 import com.dev.responses.LoginResponse;
+import com.dev.responses.UserStatsResponse;
+import com.dev.utils.Errors;
 import com.dev.utils.Persist;
 import com.dev.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static com.dev.utils.Errors.*;
 
+
 @RestController
-public class LoginController {
+public class LoginController extends MainController{
 
 
     @Autowired
@@ -24,48 +26,52 @@ public class LoginController {
     @Autowired
     private Persist persist;
 
+    @Autowired
+    private LiveUpdatesController liveUpdatesController;
+
+
 
     @RequestMapping(value = "sign-up")
-    public BasicResponse signUp (String fullName , String email ,String username, String password , String repeatPassword) {
+    public BasicResponse signUp(String fullName, String email, String username, String password, String repeatPassword) {
         BasicResponse basicResponse = new BasicResponse();
         boolean success = false;
         Integer errorCode = null;
         fullName = fullName.trim();
-        username= username.trim();
+        username = username.trim();
         password = password.trim();
         email = email.trim();
         repeatPassword = repeatPassword.trim();
         if (username != null) {
-            if (utils.isValidUsername(username)){
-                if (password != null && repeatPassword!=null){
-                    if (password.equals(repeatPassword)){
+            if (utils.isValidUsername(username)) {
+                if (password != null && repeatPassword != null) {
+                    if (password.equals(repeatPassword)) {
                         if (utils.isStrongPassword(password) && utils.isStrongPassword(repeatPassword)) {
-                            if (fullName!=null){
-                                if (email!=null){
+                            if (fullName != null) {
+                                if (email != null) {
                                     User fromDb = persist.getUserByUsername(username);
                                     if (fromDb == null) {
-                                        User toAdd = new User(username, utils.createHash(username, password),fullName,email);
+                                        User toAdd = new User(username, utils.createHash(username, password), fullName, email);
                                         persist.saveUser(toAdd);
                                         success = true;
                                     } else {
                                         errorCode = ERROR_USERNAME_ALREADY_EXISTS;
                                     }
-                                }else {
+                                } else {
                                     errorCode = ERROR_MISSING_EMAIL;
                                 }
-                            }else {
+                            } else {
                                 errorCode = ERROR_MISSING_FULLNAME;
                             }
                         } else {
                             errorCode = ERROR_WEAK_PASSWORD;
                         }
-                    }else {
+                    } else {
                         errorCode = ERROR_PASSWORD_DONT_MATCH;
                     }
                 } else {
                     errorCode = ERROR_MISSING_PASSWORD;
                 }
-            }else {
+            } else {
                 errorCode = ERROR_WEAK_USERNAME;
             }
         } else {
@@ -76,51 +82,42 @@ public class LoginController {
         return basicResponse;
     }
 
-    @RequestMapping (value = "login" , method = RequestMethod.POST)
-    public BasicResponse login (String username, String password) {
-        BasicResponse basicResponse = new BasicResponse();
-        boolean success = false;
-        Integer errorCode = null;
+    @RequestMapping(value = "login", method = RequestMethod.POST)
+    public BasicResponse login(String username, String password) {
+        BasicResponse basicResponse = new BasicResponse(false,GENERAL_ERROR);
         if (username != null) {
-            username= username.trim();
-            if (utils.isValidUsername(username)){
-                if (password != null) {
+            username = username.trim();
+            if (password != null) {
                     String token = utils.createHash(username, password);
                     User user = persist.getUserByUsernameAndToken(username, token);
                     if (user != null) {
-                        success = true;
-                        basicResponse = new LoginResponse(true,null,token,user.getId());
+                        basicResponse = new LoginResponse(true, null, token, user.getId() ,user.getUserType());
                     } else {
-                        errorCode = ERROR_WRONG_LOGIN_CREDS;
+                        basicResponse.setErrorCode(ERROR_WRONG_LOGIN_CREDS);
                     }
-                } else {
-                    errorCode = ERROR_MISSING_PASSWORD;
-                }
-            }else {
-                errorCode = ERROR_MISSING_USERNAME;
             }
-
+            else {
+                basicResponse.setErrorCode(ERROR_MISSING_PASSWORD);
+            }
         } else {
-            errorCode = ERROR_MISSING_USERNAME;
+            basicResponse.setErrorCode(ERROR_MISSING_USERNAME);
         }
-        basicResponse.setSuccess(success);
-        basicResponse.setErrorCode(errorCode);
         return basicResponse;
     }
-
-    @RequestMapping (value = "admin-login" , method = RequestMethod.POST)
-    public BasicResponse loginAdminUser (String username, String password) {
-        BasicResponse response = new BasicResponse(false,GENERAL_ERROR);
-        if (username!=null){
-            if (password!=null){
-                AdminUser adminUser = persist.getAdminUser(username, password);
-                String uniqueToken = utils.createHash(username,password);
-                if (adminUser!=null){
-                    response = new AdminLoginResponse(true,null,uniqueToken);
-                }
-            }
+    @RequestMapping(value = "get-user-stats", method = RequestMethod.GET)
+    public BasicResponse getUserStats(String token , Integer userId){
+        BasicResponse response = basicValidation(token, userId);
+        if (response.isSuccess()){
+            User user = persist.getUserById(userId);
+            response = new UserStatsResponse(true,null,new UserStatsModel(user));
         }
         return response;
     }
+
+
+
+
+
+
 
 }

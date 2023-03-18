@@ -35,6 +35,9 @@ public class User {
     @Column
     private Integer credit;
 
+    @Column
+    private String userType;
+
 
 
     public User() {
@@ -48,10 +51,17 @@ public class User {
         this.email = email;
         this.credit = Definitions.INITIAL_CREDIT;
         this.creationDate = new Date();
-
+        this.userType = Definitions.USER_PARAM;
     }
 
 
+    public String getUserType() {
+        return userType;
+    }
+
+    public void setUserType(String userType) {
+        this.userType = userType;
+    }
 
     public int getId() {
         return id;

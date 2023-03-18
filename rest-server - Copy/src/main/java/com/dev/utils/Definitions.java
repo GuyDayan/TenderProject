@@ -12,6 +12,10 @@ public class Definitions {
 
     public static final String EVENT_TYPING = "1";
 
+    public static final String EVENT_LIVE_STATS = "LIVE-STATS";
+
+    public static final String EVENT_PLACE_BID = "PLACE-BID";
+
     public static final int MIN_BIDS_FOR_CLOSE_AUCTION = 3;
 
     public static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -21,6 +25,14 @@ public class Definitions {
 
     public static final int ADD_PRODUCT_FEE = 2;
     public static final double PRODUCT_SELL_PROFIT_PERCENT = 0.95;
+
+    public static final String USER_PARAM = "user";
+    public static final String ADMIN_PARAM = "admin";
+
+
+
+
+
 
 
 }

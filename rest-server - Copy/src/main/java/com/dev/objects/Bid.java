@@ -32,12 +32,15 @@ public class Bid {
 
     }
 
-    public Bid(User buyerUser, Product product, Integer offer) {
+    public Bid(User sellerUser , User buyerUser, Product product, Integer offer) {
+        this.sellerUser = sellerUser;
         this.buyerUser = buyerUser;
         this.product = product;
         this.offer = offer;
         this.bidDate = new Date();
     }
+
+
 
     public int getId() {
         return id;

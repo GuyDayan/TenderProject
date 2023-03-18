@@ -2,19 +2,19 @@ package com.dev.responses;
 
 public class AdminLoginResponse extends BasicResponse{
 
-    private String uniqueToken;
+    private String token;
 
-    public AdminLoginResponse(boolean success, Integer errorCode, String uniqueToken) {
+    public AdminLoginResponse(boolean success, Integer errorCode, String token) {
         super(success, errorCode);
-        this.uniqueToken = uniqueToken;
+        this.token = token;
     }
 
 
-    public String getUniqueToken() {
-        return uniqueToken;
+    public String getToken() {
+        return token;
     }
 
-    public void setUniqueToken(String uniqueToken) {
-        this.uniqueToken = uniqueToken;
+    public void setToken(String token) {
+        this.token = token;
     }
 }

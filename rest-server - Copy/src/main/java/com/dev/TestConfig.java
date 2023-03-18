@@ -50,7 +50,6 @@ public class TestConfig {
         configuration.addAnnotatedClass(User.class);
         configuration.addAnnotatedClass(Product.class);
         configuration.addAnnotatedClass(Bid.class);
-        configuration.addAnnotatedClass(AdminUser.class);
         ServiceRegistry serviceRegistry = new StandardServiceRegistryBuilder()
                 .applySettings(configuration.getProperties()).build();
         return configuration.buildSessionFactory(serviceRegistry);

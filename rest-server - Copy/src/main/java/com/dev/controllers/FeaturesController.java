@@ -24,12 +24,15 @@ public class FeaturesController extends MainController {
     @Autowired
     private Utils utils;
 
+    @Autowired
+    private LiveUpdatesController liveUpdatesController;
+
     @RequestMapping(value = "get-my-products", method = RequestMethod.GET)
     public BasicResponse getMyProducts(String token, Integer userId) {
         BasicResponse response = basicValidation(token, userId);
         if (response.isSuccess()) {
-            List<Product> products = persist.getProductsBySellerUserId(userId);
-            List<Bid> bids = persist.getBidsBySellerUserId(userId);
+            List<Product> products = persist.getMyProductsForSale(userId);
+            List<Bid> bids = persist.getBidsOnMyProducts(userId);
             List<MyProductsModel> productsList = utils.calculateBiggestBids(products, bids);
             response = new MyProductsResponse(true, null, productsList);
         }
@@ -54,16 +57,18 @@ public class FeaturesController extends MainController {
             if (productId != null) {
                 Product product = persist.productIsExist(productId);
                 if (product != null) {
-                    if (product.getSellerUser().getId() != userId) {
+                    User sellerUser = product.getSellerUser();
+                    if (sellerUser.getId() != userId) {
                         if (product.isOpenForSale()) {
                             int creditBalance = persist.getUserCredit(token,userId) - offer;
                             if (creditBalance >= 0){
                                 Integer maxBidOffer = persist.getBiggestBidOnProduct(userId,productId);
                                 User buyerUser = persist.getUserById(userId);
-                                Bid bid = new Bid(buyerUser, product, offer);
+                                Bid bid = new Bid(sellerUser,buyerUser, product, offer);
                                 if ((maxBidOffer != null && offer > maxBidOffer) || (maxBidOffer == null && offer > product.getStartingPrice())) {
                                     persist.placeBid(bid,userId,creditBalance-Definitions.BID_COST_FEE);
                                     persist.addToSystemCredit(Definitions.BID_COST_FEE);
+                                    liveUpdatesController.sendPlaceBidEvent(sellerUser.getId(),buyerUser.getUsername());
                                     response = new BasicResponse(true, null);
                                 } else {
                                     response = new BasicResponse(false, Errors.ERROR_OFFER_LOW);
@@ -110,7 +115,7 @@ public class FeaturesController extends MainController {
         BasicResponse response = basicValidation(token, userId);
         if (response.isSuccess()) {
             List<Product> productsForSale = persist.getProductsForSale(userId);
-            List<Bid> bidsOnActiveAuctions = persist.getBidsOnActiveAuctions(userId);
+            List<Bid> bidsOnActiveAuctions = persist.getBidsOnActiveAuctions();
             Map<Product, TotalBidsCounter>  productsBidsMap =  utils.calculateProductsBidsMap(productsForSale,bidsOnActiveAuctions,userId);
             response = new ProductsForSaleResponse(true,null,productsBidsMap);
         }
@@ -222,4 +227,8 @@ public class FeaturesController extends MainController {
         }
         return response;
     }
+
+
+
+
 }

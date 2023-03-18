@@ -2,7 +2,6 @@
 package com.dev.utils;
 
 import com.dev.objects.*;
-import com.sun.xml.bind.v2.model.core.EnumLeafInfo;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -131,7 +130,7 @@ public class Persist {
 
 
 
-    public List<Bid> getBidsBySellerUserId(Integer userId) {
+    public List<Bid> getBidsOnMyProducts(Integer userId) {
         Session session = sessionFactory.openSession();
         List<Bid> bids =
                 session.createQuery("FROM Bid WHERE sellerUser.id =:userId")
@@ -280,16 +279,17 @@ public class Persist {
     public void addToSystemCredit(Integer creditToAdd) {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
-        AdminUser adminUser = (AdminUser) session.createQuery("FROM AdminUser").uniqueResult();
-        if (adminUser!=null){
-            adminUser.setCredit(adminUser.getCredit() + creditToAdd);
+        User user = (User) session.createQuery("FROM User WHERE userType=:adminParam")
+                .setParameter("adminParam" , Definitions.ADMIN_PARAM).uniqueResult();
+        if (user!=null){
+            user.setCredit(user.getCredit() + creditToAdd);
         }
-        session.update(adminUser);
+        session.update(user);
         transaction.commit();
         session.close();
     }
 
-    public List<Bid> getBidsOnActiveAuctions(Integer userId) {
+    public List<Bid> getBidsOnActiveAuctions() {
         Session session = sessionFactory.openSession();
         List<Bid> bids =
                 session.createQuery("FROM Bid WHERE product.openForSale=TRUE").list();
@@ -297,23 +297,9 @@ public class Persist {
         return bids;
     }
 
-    public AdminUser getAdminUser(String username , String password) {
-        Session session = sessionFactory.openSession();
-        AdminUser adminUser =
-                (AdminUser) session.createQuery("FROM AdminUser WHERE username=:username AND password=:password")
-                        .setParameter("username",username).setParameter("password", password).uniqueResult();
-        session.close();
-        return adminUser;
-    }
 
-    public AdminUser validateAdminToken(String uniqueToken){
-        Session session = sessionFactory.openSession();
-        AdminUser adminUser =
-                (AdminUser) session.createQuery("FROM AdminUser WHERE uniqueToken=: uniqueToken")
-                        .setParameter("uniqueToken",uniqueToken).uniqueResult();
-        session.close();
-        return adminUser;
-    }
+
+
 
 
 }

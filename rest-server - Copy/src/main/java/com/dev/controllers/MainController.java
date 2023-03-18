@@ -35,6 +35,8 @@ public class MainController {
         }
         return response;
     }
+
+
     public boolean userHasPermissions(int userId, String token){
         return persist.userHasPermissions(userId,token);
     }
