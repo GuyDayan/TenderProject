@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -135,8 +136,10 @@ public class FeaturesController extends MainController {
                         List<Bid> bidsOnProductAsc = persist.getBidsByProductIdBidDateAsc(productId);
                         if (bidsOnProductAsc.size() >= Definitions.MIN_BIDS_FOR_CLOSE_AUCTION) {
                             Product closedProduct = persist.closeAuction(productId);
+                            List<Integer> biddersId = persist.getBiddersIdOnProduct(productId);
                             if (!closedProduct.isOpenForSale()) {
                                 // update winner user , if winner user charge seller 5% of offer
+                                liveUpdatesController.sendCloseAuctionEvent(product.getSellerUser().getUsername(),biddersId);
                                 User winnerUser = utils.checkForAuctionWinner(bidsOnProductAsc, product);
                                 persist.saveWinnerUser(closedProduct.getId(),winnerUser);
                                 if (winnerUser!=null){

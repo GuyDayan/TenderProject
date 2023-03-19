@@ -15,6 +15,8 @@ public class Definitions {
     public static final String EVENT_LIVE_STATS = "LIVE-STATS";
 
     public static final String EVENT_PLACE_BID = "PLACE-BID";
+    public static final String EVENT_CLOSE_AUCTION = "CLOSE-AUCTION";
+
 
     public static final int MIN_BIDS_FOR_CLOSE_AUCTION = 3;
 

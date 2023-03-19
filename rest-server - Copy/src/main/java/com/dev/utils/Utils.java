@@ -134,4 +134,8 @@ public class Utils {
         }
         return totalBidsCounterMap;
     }
+
+    public List<Integer> removeUserIdDuplicates(List<Integer> biddersId) {
+        return new ArrayList<>(new HashSet<>(biddersId));
+    }
 }

@@ -298,8 +298,12 @@ public class Persist {
     }
 
 
-
-
-
-
+    public List<Integer> getBiddersIdOnProduct(Integer productId) {
+        Session session = sessionFactory.openSession();
+        List<Integer> biddersId =
+                session.createQuery("SELECT Bid.buyerUser.id FROM Bid WHERE product.id =: productId").
+                        setParameter("productId" , productId).list();
+        session.close();
+        return biddersId;
+    }
 }
