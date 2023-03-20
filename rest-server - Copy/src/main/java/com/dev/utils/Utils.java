@@ -52,7 +52,7 @@ public class Utils {
     public List<MyProductsModel> calculateBiggestBids(List<Product> products , List<Bid> bids) {
         List<MyProductsModel> productModelList = new ArrayList<>();
         for (Product product : products){
-            int currentBiggestBid = product.getStartingPrice();
+            Integer currentBiggestBid = product.getStartingPrice();
             for (Bid bid : bids){
                 if (product.getId() == bid.getProduct().getId()){
                     if (bid.getOffer() > currentBiggestBid){
@@ -60,6 +60,7 @@ public class Utils {
                     }
                 }
             }
+            if (currentBiggestBid.equals(product.getStartingPrice())) currentBiggestBid = null;
             MyProductsModel productModel = new MyProductsModel(product,currentBiggestBid);
             productModelList.add(productModel);
         }
@@ -127,7 +128,7 @@ public class Utils {
                     if (bid.getBuyerUser().getId() == userId){
                         totalBidsCounter.setUserTotalBids(totalBidsCounter.getUserTotalBids() + 1);
                     }
-                    totalBidsCounter.setAllUsersTotalBids(totalBidsCounter.getAllUsersTotalBids() +1);
+                    totalBidsCounter.setAllUsersTotalBids(totalBidsCounter.getAllUsersTotalBids() + 1);
                 }
             }
             totalBidsCounterMap.put(product,totalBidsCounter);

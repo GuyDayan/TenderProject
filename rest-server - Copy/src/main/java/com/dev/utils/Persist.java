@@ -8,6 +8,7 @@ import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.List;
 
 @Component
@@ -18,6 +19,29 @@ public class Persist {
     @Autowired
     public Persist (SessionFactory sf) {
         this.sessionFactory = sf;
+    }
+
+    @PostConstruct
+    public void createAdmin(){
+        Session session = sessionFactory.openSession();
+        String username = "admin";
+        String password = "123456";
+        Utils utils = new Utils();
+        User user = getAdminUser();
+        if (user == null){
+            User adminUser = new User(username, utils.createHash(username, password), username, "admin@gmail.com", Definitions.ADMIN_PARAM);
+            adminUser.setCredit(0);
+            session.save(adminUser);
+        }
+        session.close();
+    }
+    public User getAdminUser(){
+        Session session = sessionFactory.openSession();
+        User adminUser = (User) session.createQuery("FROM User WHERE userType =:admin ")
+                .setParameter("admin", Definitions.ADMIN_PARAM)
+                .uniqueResult();
+        session.close();
+        return adminUser;
     }
 
     public User getUserByUsername (String username) {
@@ -261,8 +285,8 @@ public class Persist {
     public Bid getWinningBid(Integer winnerUserId, Integer closedProductId) {
         Session session = sessionFactory.openSession();
        Bid bid =
-               (Bid) session.createQuery("FROM Bid WHERE buyerUser.id =: winnerUserId AND product.id=: closedProductId")
-                        .setParameter("winnerUserId",winnerUserId).setParameter("closedProductId",closedProductId).uniqueResult();
+               (Bid) session.createQuery("FROM Bid WHERE buyerUser.id =: winnerUserId AND product.id=: closedProductId ORDER BY offer DESC")
+                        .setParameter("winnerUserId",winnerUserId).setParameter("closedProductId",closedProductId).setMaxResults(1).uniqueResult();
         session.close();
         return bid;
     }
@@ -301,7 +325,7 @@ public class Persist {
     public List<Integer> getBiddersIdOnProduct(Integer productId) {
         Session session = sessionFactory.openSession();
         List<Integer> biddersId =
-                session.createQuery("SELECT Bid.buyerUser.id FROM Bid WHERE product.id =: productId").
+                session.createQuery("SELECT buyerUser.id FROM Bid WHERE product.id =: productId").
                         setParameter("productId" , productId).list();
         session.close();
         return biddersId;

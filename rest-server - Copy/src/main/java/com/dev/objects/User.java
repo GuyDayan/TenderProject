@@ -44,14 +44,14 @@ public class User {
 
     }
 
-    public User(String username, String token,String fullName,String email) {
+    public User(String username, String token,String fullName,String email,String userType) {
         this.username = username;
         this.token = token;
         this.fullName = fullName;
         this.email = email;
         this.credit = Definitions.INITIAL_CREDIT;
         this.creationDate = new Date();
-        this.userType = Definitions.USER_PARAM;
+        this.userType = userType;
     }
 
 

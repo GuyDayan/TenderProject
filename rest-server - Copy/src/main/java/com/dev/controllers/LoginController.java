@@ -5,6 +5,7 @@ import com.dev.objects.User;
 import com.dev.responses.BasicResponse;
 import com.dev.responses.LoginResponse;
 import com.dev.responses.UserStatsResponse;
+import com.dev.utils.Definitions;
 import com.dev.utils.Errors;
 import com.dev.utils.Persist;
 import com.dev.utils.Utils;
@@ -50,7 +51,7 @@ public class LoginController extends MainController{
                                 if (email != null) {
                                     User fromDb = persist.getUserByUsername(username);
                                     if (fromDb == null) {
-                                        User toAdd = new User(username, utils.createHash(username, password), fullName, email);
+                                        User toAdd = new User(username, utils.createHash(username, password), fullName, email, Definitions.USER_PARAM);
                                         persist.saveUser(toAdd);
                                         success = true;
                                     } else {

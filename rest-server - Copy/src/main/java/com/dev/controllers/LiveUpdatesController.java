@@ -112,12 +112,6 @@ public class LiveUpdatesController {
 
 
 
-    @RequestMapping(value = "/login-sse-handler", method = RequestMethod.GET)
-    public SseEmitter loginSse() {
-        SseEmitter sseEmitter = new SseEmitter(10L* MINUTE);
-        emitterList.add(sseEmitter);
-        return sseEmitter;
-    }
 
 
 

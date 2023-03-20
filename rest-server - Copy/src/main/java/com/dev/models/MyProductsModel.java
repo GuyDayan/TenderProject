@@ -16,20 +16,12 @@ public class MyProductsModel {
 //    private int userId;
 
     private boolean isOpenForSale;
-    private int biggestBid;
+    private Integer biggestBid;
 
 
-//    public ProductModel(Product product){
-//        this.id = product.getId();
-//        this.name = product.getName();
-//        this.description = product.getDescription();
-//        this.creationDate = simpleDateFormat.format(product.getCreationDate());
-//        this.startingPrice = product.getStartingPrice();
-//        this.username = product.getSellerUser().getUsername();
-//        this.userId = product.getSellerUser().getId();
-//    }
 
-    public MyProductsModel(Product product , int biggestBid){
+
+    public MyProductsModel(Product product , Integer biggestBid){
         this.id = product.getId();
         this.name = product.getName();
         this.biggestBid = biggestBid;
@@ -60,11 +52,11 @@ public class MyProductsModel {
         isOpenForSale = openForSale;
     }
 
-    public int getBiggestBid() {
+    public Integer getBiggestBid() {
         return biggestBid;
     }
 
-    public void setBiggestBid(int biggestBid) {
+    public void setBiggestBid(Integer biggestBid) {
         this.biggestBid = biggestBid;
     }
 }
