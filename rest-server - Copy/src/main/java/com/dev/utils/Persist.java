@@ -2,6 +2,7 @@
 package com.dev.utils;
 
 import com.dev.objects.*;
+import com.dev.pojo.Stats;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -89,31 +90,9 @@ public class Persist {
         return user;
     }
 
-    public List<Message> getMessagesByToken (String token) {
-        Session session = sessionFactory.openSession();
-        List<Message> messages = session.createQuery("FROM Message WHERE recipient.token = :token ")
-                .setParameter("token", token)
-                .list();
-        session.close();
-        return messages;
-    }
-
-    public List<Message> getConversation (String token, int recipientId) {
-        Session session = sessionFactory.openSession();
-        List<Message> messages =
-                session.createQuery("FROM Message WHERE " +
-                                "(sender.token=:token OR recipient.token=:token)" +
-                                " AND " +
-                                "(sender.id =:id OR recipient.id=:id) ORDER BY id DESC")
-                .setParameter("token", token)
-                .setParameter("id", recipientId)
-                .list();
-        session.close();
-        return messages;
-    }
 
 
-    public User getUserById(int id){
+    public User getUserById(Integer id){
         Session session = sessionFactory.openSession();
         User user  =
                 (User) session.createQuery("FROM User WHERE id=:id").setParameter("id",id)
@@ -139,18 +118,15 @@ public class Persist {
 
     }
 
-    public List<Product> getProductsBySellerUserId(Integer userId) {
-        Session session = sessionFactory.openSession();
-        List<Product> products =
-                session.createQuery("FROM Product WHERE sellerUser.id =:userId ORDER BY id DESC")
-                        .setParameter("userId", userId)
-                        .list();
-        session.close();
-        return products;
-    }
-    public void saveMessage(Message message){
-
-    }
+//    public List<Product> getProductsBySellerUserId(Integer userId) {
+//        Session session = sessionFactory.openSession();
+//        List<Product> products =
+//                session.createQuery("FROM Product WHERE sellerUser.id =:userId ORDER BY id DESC")
+//                        .setParameter("userId", userId)
+//                        .list();
+//        session.close();
+//        return products;
+//    }
 
 
 
@@ -163,18 +139,19 @@ public class Persist {
         return bids;
     }
 
-    public List<Bid> getBidsByBuyerUserId(Integer userId) {
-        Session session = sessionFactory.openSession();
-        List<Bid> bids =
-                session.createQuery("FROM Bid WHERE buyerUser.id =:userId")
-                        .setParameter("userId", userId).list();
-        session.close();
-        return bids;
-    }
+//    public List<Bid> getBidsByBuyerUserId(Integer userId) {
+//        Session session = sessionFactory.openSession();
+//        List<Bid> bids =
+//                session.createQuery("FROM Bid WHERE buyerUser.id =:userId")
+//                        .setParameter("userId", userId).list();
+//        session.close();
+//        return bids;
+//    }
 
     public Product productIsExist(Integer productId) {
         Session session = sessionFactory.openSession();
-        return (Product) session.createQuery("FROM Product where id =:productId").setParameter("productId"  , productId).uniqueResult();
+        return (Product) session.createQuery("FROM Product where id =:productId").setParameter("productId"  , productId)
+                .uniqueResult();
     }
 
     public Product closeAuction(Integer productId) {
@@ -241,10 +218,10 @@ public class Persist {
 
 
 
-    public List<Bid> getBuyerBidsOrderByDataAsc(Integer userId) {
+    public List<Bid> getBuyerBidsOrderByIdAsc(Integer userId) {
         Session session = sessionFactory.openSession();
         List<Bid> bids =
-                session.createQuery("FROM Bid WHERE buyerUser.id =:userId ORDER BY bidDate ASC")
+                session.createQuery("FROM Bid WHERE buyerUser.id =:userId ORDER BY id ASC")
                         .setParameter("userId",userId).list();
         session.close();
         return bids;
@@ -325,9 +302,19 @@ public class Persist {
     public List<Integer> getBiddersIdOnProduct(Integer productId) {
         Session session = sessionFactory.openSession();
         List<Integer> biddersId =
-                session.createQuery("SELECT buyerUser.id FROM Bid WHERE product.id =: productId").
+                session.createQuery("SELECT DISTINCT buyerUser.id FROM Bid WHERE product.id =: productId").
                         setParameter("productId" , productId).list();
         session.close();
         return biddersId;
+    }
+
+
+    public Stats getStats() {
+        Session session = sessionFactory.openSession();
+        int totalUsers = session.createQuery("FROM User ").list().size();
+        int totalAuctions = session.createQuery("FROM Product").list().size();
+        int totalBids = session.createQuery("FROM Bid ").list().size();
+        return new Stats(totalUsers,totalAuctions,totalBids);
+
     }
 }

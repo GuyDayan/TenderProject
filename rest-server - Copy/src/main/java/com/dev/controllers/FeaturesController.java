@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -43,7 +42,7 @@ public class FeaturesController extends MainController {
     public BasicResponse getMyBids(String token, Integer userId){
         BasicResponse response = basicValidation(token, userId);
         if (response.isSuccess()){
-            List<Bid> bids = persist.getBuyerBidsOrderByDataAsc(userId);
+            List<Bid> bids = persist.getBuyerBidsOrderByIdAsc(userId);
             List<Product> winningProducts = persist.getWinningProducts(userId);
             Map<Bid,Boolean> bidsStatusMap = utils.calculateBidsStatusMap(bids,winningProducts);
             response = new MyBidsResponse(true,null,bidsStatusMap);
@@ -55,42 +54,48 @@ public class FeaturesController extends MainController {
     public BasicResponse placeBid(String token, Integer userId, Integer productId, int offer) {
         BasicResponse response = basicValidation(token, userId);
         if (response.isSuccess()) {
-            if (productId != null) {
-                Product product = persist.productIsExist(productId);
-                if (product != null) {
-                    User sellerUser = product.getSellerUser();
-                    if (sellerUser.getId() != userId) {
-                        if (product.isOpenForSale()) {
-                            int creditBalance = persist.getUserCredit(token,userId) - offer;
-                            if (creditBalance >= 0){
-                                Integer maxBidOffer = persist.getBiggestBidOnProduct(userId,productId);
-                                User buyerUser = persist.getUserById(userId);
-                                Bid bid = new Bid(sellerUser,buyerUser, product, offer);
-                                if ((maxBidOffer != null && offer > maxBidOffer) || (maxBidOffer == null && offer > product.getStartingPrice())) {
-                                    persist.placeBid(bid,userId,creditBalance-Definitions.BID_COST_FEE);
-                                    persist.addToSystemCredit(Definitions.BID_COST_FEE);
-                                    liveUpdatesController.sendPlaceBidEvent(sellerUser.getId(),buyerUser.getUsername());
-                                    response = new BasicResponse(true, null);
-                                } else {
-                                    response = new BasicResponse(false, Errors.ERROR_OFFER_LOW);
+            if (offer % 1 == 0){
+                if (productId != null) {
+                    Product product = persist.productIsExist(productId);
+                    if (product != null) {
+                        User sellerUser = product.getSellerUser();
+                        if (sellerUser.getId() != userId) {
+                            if (product.isOpenForSale()) {
+                                int creditBalance = persist.getUserCredit(token,userId) - offer;
+                                if (creditBalance >= 0){
+                                    Integer maxBidOffer = persist.getBiggestBidOnProduct(userId,productId);
+                                    User buyerUser = persist.getUserById(userId);
+                                    Bid bid = new Bid(sellerUser,buyerUser, product, offer);
+                                    if ((maxBidOffer != null && offer > maxBidOffer) || (maxBidOffer == null && offer > product.getStartingPrice())) {
+                                        persist.placeBid(bid,userId,creditBalance-Definitions.BID_COST_FEE);
+                                        persist.addToSystemCredit(Definitions.BID_COST_FEE);
+                                        liveUpdatesController.sendPlaceBidEvent(sellerUser.getId(),buyerUser.getUsername());
+                                        liveUpdatesController.sendStatsEvent();
+                                        response = new BasicResponse(true, null);
+                                    } else {
+                                        response = new BasicResponse(false, Errors.ERROR_OFFER_LOW);
+                                    }
+                                }else {
+                                    response = new BasicResponse(false, Errors.ERROR_NOT_ENOUGH_CREDIT);
+
                                 }
-                            }else {
-                                response = new BasicResponse(false, Errors.ERROR_NOT_ENOUGH_CREDIT);
+                            } else {
+                                response = new BasicResponse(false, Errors.ERROR_PRODUCT_NOT_ON_SALE);
 
                             }
                         } else {
-                            response = new BasicResponse(false, Errors.ERROR_PRODUCT_NOT_ON_SALE);
-
+                            response = new BasicResponse(false, Errors.ERROR_BID_ON_YOUR_PRODUCT);
                         }
                     } else {
-                        response = new BasicResponse(false, Errors.ERROR_BID_ON_YOUR_PRODUCT);
+                        response = new BasicResponse(false, Errors.ERROR_PRODUCT_DOESNT_EXIST);
+
                     }
                 } else {
-                    response = new BasicResponse(false, Errors.ERROR_PRODUCT_DOESNT_EXIST);
-
+                    response = new BasicResponse(false, Errors.ERROR_MISSING_PRODUCT_ID);
                 }
-            } else {
-                response = new BasicResponse(false, Errors.ERROR_MISSING_PRODUCT_ID);
+            }else {
+                response = new BasicResponse(false, Errors.ERROR_MUST_BE_INTEGER);
+
             }
         }
         return response;
@@ -152,6 +157,7 @@ public class FeaturesController extends MainController {
                                     persist.updateUserCredit(winnerUser.getId() , winnerUserCreditBalance);
                                     persist.updateUserCredit(sellerUser.getId() , sellerUserCreditBalance);
                                     persist.addToSystemCredit((int)systemProfitCredit);
+                                    liveUpdatesController.sendStatsEvent();
                                 }
                                 response = new BasicResponse(true, null);
                             } else {
@@ -196,6 +202,7 @@ public class FeaturesController extends MainController {
                                             Product product = new Product(name, logoUrl, description, startingPrice, user);
                                             persist.addProduct(product,userId, creditBalance);
                                             persist.addToSystemCredit(Definitions.ADD_PRODUCT_FEE);
+                                            liveUpdatesController.sendStatsEvent();
                                             response = new BasicResponse(true, null);
                                         }else {
                                             response = new BasicResponse(false, Errors.ERROR_NOT_ENOUGH_CREDIT);

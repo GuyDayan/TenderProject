@@ -2,6 +2,7 @@ package com.dev.utils;
 
 public class Errors {
     public static final int  GENERAL_ERROR = 10;
+
     public static final int  MISSING_PARAMS = 11;
     public static final int NO_SUCH_USER = 12;
     public static final int PERMISSION_ERROR_CODE = 413;
@@ -37,7 +38,7 @@ public class Errors {
     public static final int ERROR_USERNAME_ALREADY_EXISTS = 1003;
     public static final int ERROR_WRONG_LOGIN_CREDS = 1004;
     public static final int ERROR_NO_SUCH_TOKEN = 1005;
-    public static final int NO_SUCH_RECIPIENT = 1006;
+
 
     public static final int ERROR_MISSING_TOKEN = 1007;
 

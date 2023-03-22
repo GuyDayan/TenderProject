@@ -8,14 +8,12 @@ public class Definitions {
     public static final int SECOND = 1000;
     public static final int MINUTE = 60 * SECOND;
 
-    public static final int INITIAL_CREDIT = 1000;
-
-    public static final String EVENT_TYPING = "1";
-
-    public static final String EVENT_LIVE_STATS = "LIVE-STATS";
+    public static final int USER_INITIAL_CREDIT = 1000;
 
     public static final String EVENT_PLACE_BID = "PLACE-BID";
     public static final String EVENT_CLOSE_AUCTION = "CLOSE-AUCTION";
+
+    public static final String EVENT_STATS = "STATS";
 
 
     public static final int MIN_BIDS_FOR_CLOSE_AUCTION = 3;

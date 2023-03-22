@@ -2,11 +2,12 @@ package com.dev.controllers;
 
 import com.dev.models.UserStatsModel;
 import com.dev.objects.User;
+import com.dev.pojo.Stats;
 import com.dev.responses.BasicResponse;
 import com.dev.responses.LoginResponse;
+import com.dev.responses.StatsResponse;
 import com.dev.responses.UserStatsResponse;
 import com.dev.utils.Definitions;
-import com.dev.utils.Errors;
 import com.dev.utils.Persist;
 import com.dev.utils.Utils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,7 @@ public class LoginController extends MainController{
                                     if (fromDb == null) {
                                         User toAdd = new User(username, utils.createHash(username, password), fullName, email, Definitions.USER_PARAM);
                                         persist.saveUser(toAdd);
+                                        liveUpdatesController.sendStatsEvent();
                                         success = true;
                                     } else {
                                         errorCode = ERROR_USERNAME_ALREADY_EXISTS;
@@ -112,6 +114,13 @@ public class LoginController extends MainController{
             User user = persist.getUserById(userId);
             response = new UserStatsResponse(true,null,new UserStatsModel(user));
         }
+        return response;
+    }
+
+    @RequestMapping(value = "get-stats", method = RequestMethod.GET)
+    public BasicResponse getStats(){
+        Stats stats = persist.getStats();
+        BasicResponse response = new StatsResponse(true,null,stats);
         return response;
     }
 

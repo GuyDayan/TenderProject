@@ -49,9 +49,14 @@ public class User {
         this.token = token;
         this.fullName = fullName;
         this.email = email;
-        this.credit = Definitions.INITIAL_CREDIT;
         this.creationDate = new Date();
         this.userType = userType;
+        if (userType.equals(Definitions.USER_PARAM)){
+            this.credit = Definitions.USER_INITIAL_CREDIT;
+        }
+        if (userType.equals(Definitions.ADMIN_PARAM)){
+            this.credit = 0;
+        }
     }
 
 
