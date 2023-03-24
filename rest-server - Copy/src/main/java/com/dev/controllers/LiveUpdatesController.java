@@ -53,7 +53,7 @@ public class LiveUpdatesController {
                 try {
                     sseEmitter.send(EVENT_STATS);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    System.out.println(e.getMessage());
                 }
             }
         }
