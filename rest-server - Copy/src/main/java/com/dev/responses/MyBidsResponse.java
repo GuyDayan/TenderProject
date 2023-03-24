@@ -11,10 +11,12 @@ public class MyBidsResponse extends BasicResponse{
 
     private List<MyBidsModel> myBids = new ArrayList<>();
 
-    public MyBidsResponse(boolean success, Integer errorCode, Map<Bid, Boolean> myBids) {
+
+
+    public MyBidsResponse(boolean success, Integer errorCode, List<Bid> myBids) {
         super(success, errorCode);
-        for (Map.Entry<Bid,Boolean> entry : myBids.entrySet()){
-            this.myBids.add(new MyBidsModel(entry.getKey() , entry.getValue()));
+        for (Bid bid : myBids){
+            this.myBids.add(new MyBidsModel(bid));
         }
     }
 

@@ -67,17 +67,17 @@ public class Utils {
         return productModelList;
     }
 
-    public User checkForAuctionWinner(List<Bid> bidsOnProductAsc, Product currentProduct) {
-        User winnerUser = null;
-        Integer maxPrice = currentProduct.getStartingPrice();
-        for (Bid bid : bidsOnProductAsc){
-            if (bid.getOffer() > maxPrice){
-                maxPrice = bid.getOffer();
-                winnerUser = bid.getBuyerUser();
-            }
-        }
-        return winnerUser;
-    }
+//    public User checkForAuctionWinner(List<Bid> bidsOnProductAsc, Product currentProduct) {
+//        User winnerUser = null;
+//        Integer maxPrice = currentProduct.getStartingPrice();
+//        for (Bid bid : bidsOnProductAsc){
+//            if (bid.getOffer() > maxPrice){
+//                maxPrice = bid.getOffer();
+//                winnerUser = bid.getBuyerUser();
+//            }
+//        }
+//        return winnerUser;
+//    }
 
 
 
@@ -87,7 +87,7 @@ public class Utils {
             for (Bid bid : bids){
                 bidsStatusMap.put(bid,false);
             }
-        }else {
+        } else {
             for (Product product : winningProducts){
                 Bid highestBid = null;
                 for (Bid bid : bids){
@@ -136,7 +136,4 @@ public class Utils {
         return totalBidsCounterMap;
     }
 
-    public List<Integer> removeUserIdDuplicates(List<Integer> biddersId) {
-        return new ArrayList<>(new HashSet<>(biddersId));
-    }
 }

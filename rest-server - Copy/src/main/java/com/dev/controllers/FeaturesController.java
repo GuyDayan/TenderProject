@@ -1,5 +1,6 @@
 package com.dev.controllers;
 
+import com.dev.models.MyBidsModel;
 import com.dev.models.MyProductsModel;
 import com.dev.objects.*;
 import com.dev.pojo.TotalBidsCounter;
@@ -42,10 +43,8 @@ public class FeaturesController extends MainController {
     public BasicResponse getMyBids(String token, Integer userId){
         BasicResponse response = basicValidation(token, userId);
         if (response.isSuccess()){
-            List<Bid> bids = persist.getBuyerBidsOrderByIdAsc(userId);
-            List<Product> winningProducts = persist.getWinningProducts(userId);
-            Map<Bid,Boolean> bidsStatusMap = utils.calculateBidsStatusMap(bids,winningProducts);
-            response = new MyBidsResponse(true,null,bidsStatusMap);
+            List<Bid> myBids = persist.getBuyerBidsOrderByIdAsc(userId);
+            response = new MyBidsResponse(true,null,myBids);
         }
         return response;
     }
@@ -140,25 +139,25 @@ public class FeaturesController extends MainController {
                     if (product.getSellerUser().getId() == userId) {
                         List<Bid> bidsOnProductAsc = persist.getBidsByProductIdBidDateAsc(productId);
                         if (bidsOnProductAsc.size() >= Definitions.MIN_BIDS_FOR_CLOSE_AUCTION) {
+                            List<Bid> refundedBids = bidsOnProductAsc;
                             Product closedProduct = persist.closeAuction(productId);
                             List<Integer> biddersId = persist.getBiddersIdOnProduct(productId);
                             if (!closedProduct.isOpenForSale()) {
                                 // update winner user , if winner user charge seller 5% of offer
                                 liveUpdatesController.sendCloseAuctionEvent(product.getSellerUser().getUsername(),biddersId);
-                                User winnerUser = utils.checkForAuctionWinner(bidsOnProductAsc, product);
-                                persist.saveWinnerUser(closedProduct.getId(),winnerUser);
-                                if (winnerUser!=null){
-                                    Bid bid = persist.getWinningBid(winnerUser.getId(),closedProduct.getId());
-                                    User sellerUser = bid.getSellerUser();
-                                    Integer winnerUserCreditBalance = winnerUser.getCredit() - bid.getOffer();
-                                    double sellerProfitCredit = (bid.getOffer()*Definitions.PRODUCT_SELL_PROFIT_PERCENT);
-                                    double systemProfitCredit = (bid.getOffer()* (1-Definitions.PRODUCT_SELL_PROFIT_PERCENT));
-                                    Integer sellerUserCreditBalance = sellerUser.getCredit() + (int) sellerProfitCredit;
-                                    persist.updateUserCredit(winnerUser.getId() , winnerUserCreditBalance);
-                                    persist.updateUserCredit(sellerUser.getId() , sellerUserCreditBalance);
+                                Bid winningBid = persist.getWinningBid(productId);
+                                if (winningBid != null){
+                                    persist.saveWinningBid(winningBid, closedProduct.getId());
+                                    User sellerUser = winningBid.getSellerUser();
+                                    Integer winningBidOffer = winningBid.getOffer();
+                                    double sellerProfitCredit = (winningBidOffer * Definitions.PRODUCT_SELL_PROFIT_PERCENT);
+                                    persist.addToUserCredit(sellerUser.getId() , (int) sellerProfitCredit);
+                                    double systemProfitCredit = (winningBidOffer * (1-Definitions.PRODUCT_SELL_PROFIT_PERCENT));
                                     persist.addToSystemCredit((int)systemProfitCredit);
-                                    liveUpdatesController.sendStatsEvent();
+                                    refundedBids = refundedBids.stream().filter(bid -> (bid.getId() != winningBid.getId())).collect(Collectors.toList());
                                 }
+                                persist.refundNonWinnersBidsOffers(refundedBids);
+                                liveUpdatesController.sendStatsEvent();
                                 response = new BasicResponse(true, null);
                             } else {
                                 response = new BasicResponse(false, Errors.GENERAL_ERROR);

@@ -9,12 +9,22 @@ public class MyBidsModel {
     private boolean openForSale;
     private boolean bidWinning;
 
-    public MyBidsModel(Bid bid , Boolean isWinning) {
+    public MyBidsModel(Bid bid) {
         this.productId = bid.getProduct().getId();
         this.productName = bid.getProduct().getName();
         this.offer = bid.getOffer();
         this.openForSale = bid.getProduct().isOpenForSale();
-        this.bidWinning = isWinning;
+        if (bid.getProduct().getWinningBid() == null){
+            this.bidWinning = false;
+        }else {
+            if (bid.getProduct().getWinningBid().getId() == bid.getId()){
+                this.bidWinning = true;
+            }else {
+                this.bidWinning = false;
+            }
+        }
+
+
     }
 
     public int getProductId() {

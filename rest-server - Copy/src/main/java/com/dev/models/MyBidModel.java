@@ -13,7 +13,6 @@ import static com.dev.utils.Definitions.simpleDateFormat;
 public class MyBidModel {
 
     private int id;
-
     private int productId;
     private Integer offer;
     private String bidDate;

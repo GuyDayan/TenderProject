@@ -3,6 +3,7 @@ package com.dev.utils;
 
 import com.dev.objects.*;
 import com.dev.pojo.Stats;
+import io.swagger.models.auth.In;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -30,7 +31,7 @@ public class Persist {
         Utils utils = new Utils();
         User user = getAdminUser();
         if (user == null){
-            User adminUser = new User(username, utils.createHash(username, password), username, "admin@gmail.com", Definitions.ADMIN_PARAM);
+            User adminUser = new User(username, utils.createHash(username, password), "System-User", "admin@gmail.com", Definitions.ADMIN_PARAM);
             adminUser.setCredit(0);
             session.save(adminUser);
         }
@@ -76,7 +77,8 @@ public class Persist {
 
     public List<User> getAllUsers () {
         Session session = sessionFactory.openSession();
-        List<User> allUsers = session.createQuery("FROM User ").list();
+        List<User> allUsers = session.createQuery("FROM User WHERE userType=:userParam").
+        setParameter("userParam" , Definitions.USER_PARAM).list();
         session.close();
         return allUsers;
     }
@@ -118,15 +120,6 @@ public class Persist {
 
     }
 
-//    public List<Product> getProductsBySellerUserId(Integer userId) {
-//        Session session = sessionFactory.openSession();
-//        List<Product> products =
-//                session.createQuery("FROM Product WHERE sellerUser.id =:userId ORDER BY id DESC")
-//                        .setParameter("userId", userId)
-//                        .list();
-//        session.close();
-//        return products;
-//    }
 
 
 
@@ -139,14 +132,6 @@ public class Persist {
         return bids;
     }
 
-//    public List<Bid> getBidsByBuyerUserId(Integer userId) {
-//        Session session = sessionFactory.openSession();
-//        List<Bid> bids =
-//                session.createQuery("FROM Bid WHERE buyerUser.id =:userId")
-//                        .setParameter("userId", userId).list();
-//        session.close();
-//        return bids;
-//    }
 
     public Product productIsExist(Integer productId) {
         Session session = sessionFactory.openSession();
@@ -230,17 +215,17 @@ public class Persist {
     public List<Product> getWinningProducts(Integer userId) {
         Session session = sessionFactory.openSession();
         List<Product> products =
-                session.createQuery("FROM Product WHERE winnerUser.id =:userId AND openForSale=FALSE")
+                session.createQuery("FROM Product WHERE winningBid.buyerUser.id =:userId AND openForSale=FALSE")
                         .setParameter("userId",userId).list();
         session.close();
         return products;
     }
 
-    public void saveWinnerUser(Integer productId , User winnerUser) {
+    public void saveWinningBid(Bid winningBid , Integer productId) {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
         Product product = session.get(Product.class,productId);
-        product.setWinnerUser(winnerUser);
+        product.setWinningBid(winningBid);
         session.update(product);
         transaction.commit();
         session.close();
@@ -259,14 +244,6 @@ public class Persist {
         return user.getCredit();
     }
 
-    public Bid getWinningBid(Integer winnerUserId, Integer closedProductId) {
-        Session session = sessionFactory.openSession();
-       Bid bid =
-               (Bid) session.createQuery("FROM Bid WHERE buyerUser.id =: winnerUserId AND product.id=: closedProductId ORDER BY offer DESC")
-                        .setParameter("winnerUserId",winnerUserId).setParameter("closedProductId",closedProductId).setMaxResults(1).uniqueResult();
-        session.close();
-        return bid;
-    }
 
     public void updateUserCredit(Integer userId, Integer creditBalance) {
         Session session = sessionFactory.openSession();
@@ -277,6 +254,19 @@ public class Persist {
         transaction.commit();
         session.close();
     }
+
+    public void addToUserCredit(Integer userId , Integer creditToAdd){
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        User user = session.get(User.class,userId);
+        user.setCredit(user.getCredit() + creditToAdd);
+        session.update(user);
+        transaction.commit();
+        session.close();
+    }
+
+
+
     public void addToSystemCredit(Integer creditToAdd) {
         Session session = sessionFactory.openSession();
         Transaction transaction = session.beginTransaction();
@@ -316,5 +306,24 @@ public class Persist {
         int totalBids = session.createQuery("FROM Bid ").list().size();
         return new Stats(totalUsers,totalAuctions,totalBids);
 
+    }
+
+    public Bid getWinningBid(Integer productId) {
+        Session session = sessionFactory.openSession();
+       Bid winningBid = (Bid) session.createQuery("FROM Bid WHERE (product.id = :productId) AND" +
+                        " (offer = (SELECT MAX(offer) FROM Bid WHERE product.id = :productId)) ORDER BY bidDate ASC")
+                .setParameter("productId", productId).setMaxResults(1).getSingleResult();
+       return winningBid;
+    }
+
+    public void refundNonWinnersBidsOffers(List <Bid> nonWinningBids) {
+        Session session = sessionFactory.openSession();
+        Transaction transaction = session.beginTransaction();
+        for (Bid bid : nonWinningBids){
+            addToUserCredit(bid.getBuyerUser().getId() , bid.getOffer());
+            session.update(bid);
+        }
+        transaction.commit();
+        session.close();
     }
 }
